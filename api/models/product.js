@@ -15,7 +15,7 @@ const productSchema= new mongoose.Schema({
         default: 0.0
 
     },
-    desc:{
+    description:{
         type:String,
         required:[true,"please enter product description"],
         },
@@ -40,14 +40,15 @@ const productSchema= new mongoose.Schema({
             required:[true,"Please select the category"],
             enum:{
                 values: [
-                    "electronics",
+                    "Electronics",
                     "Cameras",
-                    "laptops",
-                    "food",
+                    "Laptops",
+                    "Food",
                     "Headphones",
-                    "books",
-                    "clothes",
-                    "Sports"
+                    "Books",
+                    "Clothes",
+                    "Sports",
+                    "Accessories"
                 ],
                 message: "please select correct category"
             }
