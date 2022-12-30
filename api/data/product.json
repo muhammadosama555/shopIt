@@ -1,0 +1,24 @@
+[{
+    "name":"iphone",
+    "price": 30000,
+    "desc":"this is very nice phone",
+    "rating":5,
+    "category":"electronics",
+    "seller":"Osama",
+    "stock":3,
+    "numOfReviews":3,
+    "reviews":[]
+
+},
+{
+    "name":"Samsung",
+    "price": 20000,
+    "desc":"this is very very nice phone",
+    "rating":3,
+    "category":"electronics",
+    "seller":"waleed",
+    "stock":3,
+    "numOfReviews":3,
+    "reviews":[]
+
+}]
