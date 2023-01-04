@@ -44,6 +44,28 @@ exports.loginUser = catchAsyncErrors(async (req, res, next)=>{
     sendToken(user,200,res)
 })
 
+//Forgot Password => /api/passsword/forgot
+exports.forgotPassword = catchAsyncErrors(async(req,res,next)=>{
+
+   const user = await User.findOne({email:req.body.email})
+
+   if(!user){
+    return next(new ErrorHandler("user not found ",404))
+   }
+
+   //Get resset token 
+   const resetToken =user.getResetPasswordToken()
+
+   await user.save({validateBeforeSave:false})
+
+})
+
+
+
+
+
+
+
 
 
 //LOGOUT user => /api/v1/logot
