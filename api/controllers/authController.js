@@ -3,6 +3,7 @@ const User = require("../models/user.js")
 const ErrorHandler= require("../utils/errorHandler.js")
 const catchAsyncErrors = require("../middlewares/catchAsyncError.js")
 const sendToken = require("../utils/jwtToken.js")
+const sendEmail = require("../utils/sendEmail.js")
 
 //Register user   => /api/v1/register
 
@@ -58,6 +59,34 @@ exports.forgotPassword = catchAsyncErrors(async(req,res,next)=>{
 
    await user.save({validateBeforeSave:false})
 
+   //Create reset password url
+   const resetUrl = `${req.protocol}:// ${req.get('host')}/api/v1/passwordreset/${resetToken}`
+   const message = `your password reset token is as follows:\n\n${resetUrl}\n\n If you have 
+   requested this email,then ignore it`
+   try {
+     
+    await sendEmail({
+        email: user.email,
+        subject: 'shopIt password Recovery',
+        message
+    })
+
+     res.status(200).json({
+        success: true ,
+        message: `Email sent to : ${user.email}`
+     })
+
+
+    
+   } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires= undefined;
+
+     await user.save({validateBeforeSave:false})
+
+     return next(new ErrorHandler(error.message,500))
+
+   }
 })
 
 
