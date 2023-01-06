@@ -27,7 +27,7 @@ const orderSchema = mongoose.Schema({
    user: {
     type:mongoose.Schema.Types.ObjectId,
     required:true,
-    ref: "user" 
+    ref: "User" 
    },
    orderItems: [
       {
@@ -64,7 +64,7 @@ const orderSchema = mongoose.Schema({
    },
    paidAt:{
      
-
+    type:Date
 
    },
    itemsPrice : {
