@@ -12,6 +12,7 @@ import {
     dispatch(getProductStart());
     try {
       const res = await axios.get(`/api/v1/products?page=${currentPage}`);
+      console.log(res.data);
       dispatch(getProductSuccess(res.data));
     } catch (error) {
       dispatch(getProductFailure());

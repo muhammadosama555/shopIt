@@ -46,7 +46,7 @@ const Home = () => {
       <div className="d-flex justify-content-center mt-5">
         <Pagination
           activePage={currentPage}
-          itemsCountPerPage={resPerPage.count}
+          itemsCountPerPage={resPerPage}
           totalItemsCount={productsCount}
           onChange={setCurrentPageNo}
           nextPageText={"Next"}
