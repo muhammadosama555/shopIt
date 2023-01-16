@@ -8,11 +8,12 @@ const { isAuthenticatedUser,authorizeRoles } = require('../middlewares/auth.js')
 
 
 
-router.get("/products",getProducts,isAuthenticatedUser,authorizeRoles('admin'))
-router.post("/product/new",newProduct)
-router.get("/products/admin/:id", getSingleProduct)
-router.put("/products/admin/:id", updateProduct)
-router.delete("/products/admin/:id",  deleteProduct )
+router.get("/products",getProducts)
+router.get("/product/:id", getSingleProduct)
+
+router.post("/admin/product/new",isAuthenticatedUser,authorizeRoles('admin'),newProduct)
+router.put("/admin/products/:id",isAuthenticatedUser,authorizeRoles('admin'), updateProduct)
+router.delete("/admin/products/:id",isAuthenticatedUser,authorizeRoles('admin'),  deleteProduct )
 
 router.put("/review", isAuthenticatedUser, createProductReview)
 router.get("/reviews", isAuthenticatedUser, getProductreviews)

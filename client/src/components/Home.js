@@ -1,38 +1,64 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { getProducts } from '../reducers/apiCalls'
 import MetaData from './layout/MetaData'
+import {useDispatch, useSelector} from "react-redux"
+import Product from './product/Product'
+import Loader from './layout/Loader'
+import { useAlert } from 'react-alert'
+import Pagination from 'react-js-pagination'
 
 const Home = () => {
+
+  const {products} = useSelector((state)=>state.product.products)
+  const {isFetching,error,productsCount,resPerPage} = useSelector((state)=>state.product)
+  console.log(resPerPage.count);
+
+  const [currentPage,setCurrentPage] = useState(1)
+
+  const dispatch = useDispatch()
+  const alert = useAlert()
+
+  useEffect(()=>{
+    getProducts(dispatch,currentPage)
+    if (error) {
+      return alert.error("MY ERROR")
+    }
+  },[dispatch,alert,error,currentPage])
+
+  const setCurrentPageNo = (pageNumber) => {
+    setCurrentPage(pageNumber)
+  }
+
   return (
     <>
-    <MetaData title={"Buy best produts online"} />
+    {isFetching ? <Loader /> : (
+      <>
+       <MetaData title={"Buy best produts online"} />
     <h1 id="products_heading">Latest Products</h1>
-
-<section id="products" className="container mt-5">
-  <div className="row">
-    <div className="col-sm-12 col-md-6 col-lg-3 my-3">
-      <div className="card p-3 rounded">
-        <img
-          className="card-img-top mx-auto"
-          src="https://m.media-amazon.com/images/I/617NtexaW2L._AC_UY218_.jpg"
-        />
-        <div className="card-body d-flex flex-column">
-          <h5 className="card-title">
-            <a href="">128GB Solid Storage Memory card - SanDisk Ultra</a>
-          </h5>
-          <div className="ratings mt-auto">
-            <div className="rating-outer">
-              <div className="rating-inner"></div>
-            </div>
-            <span id="no_of_reviews">(5 Reviews)</span>
-          </div>
-          <p className="card-text">$45.67</p>
-          <a href="#" id="view_btn" className="btn btn-block">View Details</a>
-        </div>
-      </div>
-    </div>
-
+   <section id="products" className="container mt-5">
+   <div className="row">
+    {products && products.map((product)=>(
+      <Product key={product._id} product={product} />
+    ))}
+    
   </div>
 </section>
+      <div className="d-flex justify-content-center mt-5">
+        <Pagination
+          activePage={currentPage}
+          itemsCountPerPage={resPerPage.count}
+          totalItemsCount={productsCount}
+          onChange={setCurrentPageNo}
+          nextPageText={"Next"}
+          prevPageText={"Prev"}
+          firstPageText={"First"}
+          lastPageText={"Last"}
+          itemClass="page-item"
+          linkClass="page-link"
+        />
+      </div>
+      </>
+    )}
     </>
   )
 }

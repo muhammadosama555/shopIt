@@ -21,7 +21,7 @@ req.body.user= req.body.id
 // GET ALL PRODUCTS => /api/v1/products
 exports.getProducts=async (req,res,next)=>{
     
-       const resPerPage=4;
+       const resPerPage=5;
        const productCount=await Product.countDocuments();
 
        const apiFeatures= new  APIFeatures(Product.find(),req.query )
