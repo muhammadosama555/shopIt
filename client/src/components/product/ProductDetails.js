@@ -12,8 +12,7 @@ const ProductDetails = () => {
     const location = useLocation();
     const id = location.pathname.split("/")[2];
 
-    const productsDetails = useSelector((state)=>state.product.productsDetails)
-    const {isFetching,error} = useSelector((state)=>state.product)
+    const {productsDetails,isFetching,error} = useSelector((state)=>state.productSlice)
     
 
     const dispatch = useDispatch()
