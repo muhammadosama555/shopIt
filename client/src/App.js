@@ -13,6 +13,7 @@ function App() {
      <div className = "container container-fluid">
      <Routes>
      <Route path="/" element={<Home />}></Route>
+     <Route path="/search/:keyword" element={<Home />}></Route>
      <Route path="/product/:id" element={<ProductDetails />}></Route>
      </Routes>
      </div>

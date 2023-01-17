@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export const productSlice = createSlice({
-  name: "product",
+  name: "productSlice",
   initialState: {
-    products: [],
-    productsDetails: {},
+    productsData: [],
+    productsDetails: [],
     isFetching: false,
     error: false,
   },
@@ -16,7 +16,7 @@ export const productSlice = createSlice({
     },
     getProductSuccess: (state, action) => {
       state.isFetching = false;
-      state.products = action.payload;
+      state.productsData = action.payload;
     },
     getProductFailure: (state) => {
       state.isFetching = false;

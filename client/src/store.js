@@ -19,7 +19,7 @@ const persistConfig = {
   storage,
 };
 
-const rootReducer = combineReducers({ product: productReducer});
+const rootReducer = combineReducers({ productSlice: productReducer});
 
 const persistedReducer = persistReducer(persistConfig,rootReducer);
 
