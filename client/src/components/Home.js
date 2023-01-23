@@ -19,6 +19,7 @@ const Home = () => {
   const [currentPage,setCurrentPage] = useState(1)
   const [price,setPrice] = useState([1,1000])
   const [category,setCategory] = useState('')
+  const [ratings,setRatings] = useState(0)
 
   const categories = [
     "Electronics",
@@ -41,22 +42,22 @@ const Home = () => {
   const Range = createSliderWithTooltip(Slider.Range);
 
   useEffect(()=>{
-    getProducts(dispatch,currentPage,keyword,price,category)
+    getProducts(dispatch,currentPage,keyword,price,category,ratings)
     if (error) {
       return alert.error("MY ERROR")
     }
-    console.log(productsData);
-  },[dispatch,alert,error,currentPage,keyword,price,category])
+
+  },[dispatch,alert,error,currentPage,keyword,price,category,ratings])
 
   const setCurrentPageNo = (pageNumber) => {
     setCurrentPage(pageNumber)
   }
 
-  // let count = productsData.productCount;
+  let count = productsData.productCount;
 
-  // if (keyword) {
-  //   count = productsData.filteredProductsCount
-  // }
+  if (keyword) {
+    count = productsData.filteredProductsCount
+  }
 
   return (
     <>
@@ -102,6 +103,25 @@ const Home = () => {
         </ul>
        </div>
 
+
+       <hr className='my-3' />
+
+       <div className='mt-5'>
+        <h4 className='mb-3'>
+          Ratings
+        </h4>
+        <ul className='pl-0'>
+          {[5,4,3,2,1].map((star)=>(
+           <li style={{cursor:'pointer',listStyleType:'none'}} key={star} onClick={()=> setRatings(star)}>
+            <div className='rating-outer'>
+              <div className='rating-inner' style={{width: `${star * 20}%`}}>
+              </div>
+            </div>
+           </li>
+          ))}
+        </ul>
+       </div>
+
        </div>
       </div>
 
@@ -125,7 +145,7 @@ const Home = () => {
     
   </div>
 </section>
-{productsData.count <= productsData.productCount && (
+{productsData.count <= count && (
   <div className="d-flex justify-content-center mt-5">
   <Pagination
     activePage={currentPage}

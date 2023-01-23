@@ -9,7 +9,6 @@ const Search = () => {
   const searchHandler = (e) => {
     e.preventDefault()
 
-    console.log('hit');
     if (keyword.trim()) {
       history(`/search/${keyword}`)
     }else{

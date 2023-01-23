@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux';
 import { getProductsDetails } from '../../reducers/apiCalls';
@@ -8,6 +8,8 @@ import {Carousel} from "react-bootstrap"
 import MetaData from "../layout/MetaData"
 
 const ProductDetails = () => {
+
+    const [quantity,setQuantity] = useState(3)
 
     const location = useLocation();
     const id = location.pathname.split("/")[2];
@@ -20,6 +22,7 @@ const ProductDetails = () => {
 
     useEffect(()=>{
         getProductsDetails(dispatch,id)
+        console.log("hit");
         if (error) {
             alert.error(alert)
         }
@@ -27,7 +30,7 @@ const ProductDetails = () => {
 
   return (
      <>
-     {isFetching ? <Loader/> : (
+     {isFetching ? <Loader/> : (productsDetails.product !== 'undefined') && (
         <>
         <MetaData title={productsDetails.product.name} />
         <div className="row f-flex justify-content-around">
@@ -56,11 +59,11 @@ const ProductDetails = () => {
 
                 <p id="product_price">${productsDetails.product.price}</p>
                 <div className="stockCounter d-inline">
-                    <span className="btn btn-danger minus">-</span>
+                    <span className="btn btn-danger minus" onClick={()=>quantity > 1 && setQuantity(quantity-1)}>-</span>
 
-                    <input type="number" className="form-control count d-inline" value="1" readOnly />
+                    <input type="number" className="form-control count d-inline" value={quantity} readOnly />
 
-                    <span className="btn btn-primary plus">+</span>
+                    <span className="btn btn-primary plus" onClick={productsDetails.product.stock > quantity ? ()=>setQuantity(quantity + 1) : undefined}>+</span>
                 </div>
                  <button type="button" id="cart_btn" className="btn btn-primary d-inline ml-4">Add to Cart</button>
 
