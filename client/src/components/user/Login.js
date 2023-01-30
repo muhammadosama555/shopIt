@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { login } from '../../reducers/apiCalls'
 import Loader from '../layout/Loader'
 import MetaData from '../layout/MetaData'
@@ -14,6 +14,9 @@ const Login = () => {
     const alert = useAlert()
     const Navigate = useNavigate()
     const {isFetching,error,currentUser} = useSelector(state=>state.userSlice)
+    const location = useLocation()
+    console.log(location);
+    const redirect = location.search ? location.search.split('=')[1] : '/'
 
     useEffect(()=>{
         if (error) {
@@ -22,7 +25,7 @@ const Login = () => {
         }
 
       if (currentUser) {
-         Navigate("/")
+         Navigate(redirect)
       }
     },[error,Navigate,alert,currentUser])
 

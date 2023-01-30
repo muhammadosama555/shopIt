@@ -5,10 +5,12 @@ import Search from "./Search";
 import { useDispatch, useSelector } from 'react-redux'
 import { loadUser, logout } from "../../reducers/apiCalls";
 import { current } from "@reduxjs/toolkit";
+import { clearCart } from "../../reducers/cartReducers";
 
 const Header = () => {
   const dispatch = useDispatch();
   const {isFetching,error,currentUser} = useSelector(state=>state.userSlice)
+  const {products} = useSelector((state)=>state.cartSlice)
 
   // console.log(currentUser);
 //   useEffect(()=>{
@@ -17,6 +19,10 @@ const Header = () => {
 
 const logoutHandler = () => {
   logout(dispatch)
+}
+
+const handleClearCart=()=>{
+  dispatch(clearCart())
 }
 
   return (
@@ -40,9 +46,11 @@ const logoutHandler = () => {
             Cart
           </span>
           <span className="ml-1" id="cart_count">
-            2
+            {products.length}
           </span>
           </Link>
+
+          <button value='Clear cart' onClick={handleClearCart}>Clear</button>
 
           {currentUser ? (
             <div className="ml-4 dropdown d-inline">

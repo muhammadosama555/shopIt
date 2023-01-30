@@ -43,6 +43,18 @@ exports.getProducts=async (req,res,next)=>{
     })
 }
 
+// GET ALL PRODUCTS (Admin) => /api/v1/admin/products
+exports.getAdminProducts=async (req,res,next)=>{
+    
+        products= await Product.find();
+
+    res.status(200).json({
+        success: true,
+        products
+      
+    })
+}
+
 //Get single product => /api/v1/products/id
 exports.getSingleProduct=async (req,res,next)=>{
     let product = null;

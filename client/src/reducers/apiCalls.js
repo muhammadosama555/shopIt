@@ -6,6 +6,9 @@ import {
     getProductDetailsStart,
     getProductDetailsSuccess,
     getProductDetailsFailure,
+    getAdminProductStart,
+    getAdminProductSuccess,
+    getAdminProductFailure,
   } from "./productReducers";
 import { loginStart,
          loginSuccess,
@@ -24,9 +27,13 @@ import { loginStart,
          updatePasswordStart,
          updatePasswordSuccess,
          updatePasswordFailure,
+         getUsersStart,
+         getUsersSuccess,
+         getUsersFailure,
  } from "./userReducers ";
 
  import { persistor } from "../store";
+import { saveShippingInfo } from "./cartReducers";
 
 //  get all the products
   
@@ -129,3 +136,37 @@ import { loginStart,
       dispatch(updatePasswordFailure())
     }
   }
+
+  // save userShipping info
+
+  export const userShippingInfo = async (dispatch,info) => {
+    dispatch(saveShippingInfo(info))
+    
+  }
+
+  //  get all the (Admin) products details
+
+  export const getAdminProducts = async (dispatch) => {
+    dispatch(getAdminProductStart());
+    try {
+      const res = await axios.get("/api/v1/admin/products");
+      dispatch(getAdminProductSuccess(res.data));
+    } catch (error) {
+      dispatch(getAdminProductFailure());
+    }
+  };
+
+  //  get all users
+
+  export const getAllUsers = async (dispatch) => {
+    dispatch(getUsersStart())
+    try {
+      const res = await axios.get("/api/v1/admin/users")
+      dispatch(getUsersSuccess((res.data)))
+    } catch (error) {
+      dispatch(getUsersFailure())
+    }
+  } 
+
+
+  

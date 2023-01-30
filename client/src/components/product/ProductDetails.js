@@ -6,15 +6,17 @@ import { useAlert } from 'react-alert';
 import Loader from '../layout/Loader';
 import {Carousel} from "react-bootstrap"
 import MetaData from "../layout/MetaData"
+import { addProduct, addToCart } from '../../reducers/cartReducers';
 
 const ProductDetails = () => {
 
-    const [quantity,setQuantity] = useState(3)
+    const [quantity,setQuantity] = useState(1)
 
     const location = useLocation();
     const id = location.pathname.split("/")[2];
 
     const {productsDetails,isFetching,error} = useSelector((state)=>state.productSlice)
+    //console.log(productsDetails);
     
 
     const dispatch = useDispatch()
@@ -22,11 +24,18 @@ const ProductDetails = () => {
 
     useEffect(()=>{
         getProductsDetails(dispatch,id)
-        console.log("hit");
+        //console.log("hit");
         if (error) {
-            alert.error(alert)
+            alert.error(error)
         }
     },[dispatch,error,id])
+
+    const handleClick = () => {
+        const cartProduct = productsDetails.product;
+        console.log(cartProduct);
+        dispatch( addToCart({...cartProduct,quantity}))
+    }
+    
 
   return (
      <>
@@ -63,9 +72,9 @@ const ProductDetails = () => {
 
                     <input type="number" className="form-control count d-inline" value={quantity} readOnly />
 
-                    <span className="btn btn-primary plus" onClick={productsDetails.product.stock > quantity ? ()=>setQuantity(quantity + 1) : undefined}>+</span>
+                    <span className="btn btn-primary plus" onClick={()=>productsDetails.product.stock > quantity && setQuantity(quantity + 1)}>+</span>
                 </div>
-                 <button type="button" id="cart_btn" className="btn btn-primary d-inline ml-4">Add to Cart</button>
+                 <button type="button" id="cart_btn" className="btn btn-primary d-inline ml-4" onClick={handleClick}>Add to Cart</button>
 
                 <hr/>
 
