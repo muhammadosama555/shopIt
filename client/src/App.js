@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Home from "./components/Home";
 import Footer from "./components/layout/Footer";
 import Header from "./components/layout/Header";
@@ -16,16 +16,20 @@ import ConfirmOrder from "./components/cart/ConfirmOrder";
 import Dashboard from "./components/admin/Dashboard";
 import ProtectedAdminOutlet from "./components/route/ProtectedAdminOutlet";
 import UsersList from "./components/admin/UsersList";
+import Offers from "./components/layout/Offers";
+import "./App.css";
+import Search from "./components/layout/Search";
 
 function App() {
+
   return (
     <BrowserRouter>
       <div className="App">
-        <Header />
-        <div className="container container-fluid">
+        <Offers/>
+        <Header/>
           <Routes>
             <Route path="/" element={<Home />}></Route>
-            <Route path="/search/:keyword" element={<Home />}></Route>
+            <Route path="/search" element={<Search/>}></Route>
             <Route path="/product/:id" element={<ProductDetails />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route path="/register" element={<Register />}></Route>
@@ -49,7 +53,6 @@ function App() {
             </Route>
         </Routes> */}
         <Footer />
-      </div>
     </BrowserRouter>
   );
 }

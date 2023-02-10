@@ -5,6 +5,7 @@ export const productSlice = createSlice({
   initialState: {
     productsData: [],
     productsDetails: [],
+    reviews:[],
     isFetching: false,
     error: false,
   },
@@ -46,7 +47,19 @@ export const productSlice = createSlice({
       state.isFetching = false;
       state.error = true;
     },
-   
+    postReviewsStart: (state) => {
+      state.isFetching = true;
+      state.error = false;
+    },
+    postReviewsSuccess: (state, action) => {
+      state.isFetching = false;
+      state.reviews = action.payload;
+    },
+    postReviewsFailure: (state) => {
+      state.isFetching = false;
+      state.error = true;
+    },
+    
   }
 });
 
@@ -60,6 +73,9 @@ export const {
   getAdminProductStart,
   getAdminProductSuccess,
   getAdminProductFailure,
+  postReviewsStart,
+  postReviewsSuccess,
+  postReviewsFailure,
 } = productSlice.actions;
 
 export default productSlice.reducer;

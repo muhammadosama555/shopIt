@@ -9,6 +9,9 @@ import {
     getAdminProductStart,
     getAdminProductSuccess,
     getAdminProductFailure,
+    postReviewsStart,
+    postReviewsSuccess,
+    postReviewsFailure,
   } from "./productReducers";
 import { loginStart,
          loginSuccess,
@@ -33,23 +36,26 @@ import { loginStart,
  } from "./userReducers ";
 
  import { persistor } from "../store";
-import { saveShippingInfo } from "./cartReducers";
+import { clearCart, saveShippingInfo } from "./cartReducers";
 
 //  get all the products
   
-  export const getProducts = async (dispatch,currentPage=1,keyword="",price,category,ratings=0) => {
+  export const getProducts = async (dispatch,currentPage=1,keyword="",price=[0,99999],category,ratings=0) => {
     dispatch(getProductStart());
     try {
       let url = `/api/v1/products?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&rating[gte]=${ratings}`;
+      console.log(url);
       if (category) {
        url = `/api/v1/products?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&category=${category}&rating[gte]=${ratings}`;
 
       }
      
+     
       const res = await axios.get(url);
       dispatch(getProductSuccess(res.data));
     } catch (error) {
       dispatch(getProductFailure());
+      console.log(error);
     }
   };
 
@@ -61,7 +67,9 @@ import { saveShippingInfo } from "./cartReducers";
       const res = await axios.get(`/api/v1/product/${id}`);
       dispatch(getProductDetailsSuccess(res.data));
     } catch (error) {
+      
       dispatch(getProductDetailsFailure());
+      
     }
   };
 
@@ -82,9 +90,11 @@ import { saveShippingInfo } from "./cartReducers";
   export const register = async (dispatch,userData) => {
     dispatch(registerStart())
     try {
+      console.log(userData);
       const res = await axios.post("/api/v1/register",userData)
       dispatch(registerSuccess((res.data)))
     } catch (error) {
+      console.log(error);
       dispatch(registerFailure())
     }
   }
@@ -106,8 +116,9 @@ import { saveShippingInfo } from "./cartReducers";
   export const logout = async (dispatch) => {
     try {
       await axios.get("/api/v1/logout")
-      dispatch(logoutSuccess())
       persistor.purge();
+      dispatch(logoutSuccess())
+      dispatch(clearCart())
     } catch (error) {
       dispatch(logoutFailure())
     }
@@ -167,6 +178,20 @@ import { saveShippingInfo } from "./cartReducers";
       dispatch(getUsersFailure())
     }
   } 
+
+  // user to post reviews
+
+  export const postReviews = async (dispatch,reviewData) => {
+    dispatch(postReviewsStart())
+    try {
+      console.log(reviewData);
+      const res = await axios.put("/api/v1/review",reviewData)
+      dispatch(postReviewsSuccess((res.data)))
+    } catch (error) {
+      console.log(error);
+      dispatch(postReviewsFailure())
+    }
+  }
 
 
   

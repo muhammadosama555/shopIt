@@ -28,19 +28,19 @@ exports.getProducts=async (req,res,next)=>{
                           .search()
                           .filter()
                         
-         let products= await apiFeatures.query.clone();
-         let filteredProductCount = products.length
-         apiFeatures.pagination(resPerPage)
-        products= await apiFeatures.query;
-
-    res.status(200).json({
-        success: true,
-        count:products.length,
-        filteredProductCount,
-        productCount,
-        products
-      
-    })
+                          let products= await apiFeatures.query.clone();
+                          let filteredproductsCount = products.length
+                          apiFeatures.pagination(resPerPage)
+                          products= await apiFeatures.query;
+                      
+                          res.status(200).json({
+                              success: true,
+                              productCount,
+                              filteredproductsCount,
+                              count:resPerPage,
+                              products,
+                              
+                          })
 }
 
 // GET ALL PRODUCTS (Admin) => /api/v1/admin/products

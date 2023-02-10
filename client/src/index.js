@@ -6,6 +6,7 @@ import {store,persistor} from './store';
 import { PersistGate } from 'redux-persist/integration/react';
 import {positions,transitions,Provider as AlertProvider} from "react-alert"
 import AlertTemplate from "react-alert-template-basic"
+import './main.css';
 
 const options = {
    timeout:5000,

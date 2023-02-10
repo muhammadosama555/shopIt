@@ -8,7 +8,7 @@ const fileUpload= require("express-fileupload")
 const errorMiddleware= require("./middlewares/errors.js")
 
 app.use(express.json())
-app.use(bodyParser.urlencoded({extende:true}))
+app.use(bodyParser.urlencoded({extended:true}))
 app.use(cookieParser())
 app.use(fileUpload())
 

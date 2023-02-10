@@ -67,7 +67,7 @@ const userSlice = createSlice({
           state.error = false;
           state.isUpdated = action.payload.success
         },
-        updateReset: (state,action) => {
+        updateReset: (state) => {
           state.isUpdated = false
         },
         updateFailure: (state) => {

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 const CheckoutSteps = ({shipping,confirmOrder,payment}) => {
   return (
     <>
-    <div className='checkout-progress d-flex justify-content-center mt-5'>
+    <div className='checkout-progress flex justify-center mt-5'>
       {shipping ? <Link to="/shipping" className='float-right'>
         <div className='triangle2-active'></div>
         <div className='step active-step'>shipping</div>
