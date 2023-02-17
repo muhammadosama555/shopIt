@@ -47,21 +47,9 @@ const Search = () => {
     setCurrentPage(pageNumber)
   }
 
-  let count = productsData.filteredProductsCount;
 
-
- 
-  const history = useNavigate();
-
-  // const searchHandler = (e) => {
-  //   e.preventDefault()
-
-  //   if (keyword.trim()) {
-  //     history(`/search/${keyword}`)
-  //   }else{
-  //     history("/")
-  //   }
-  // }
+console.log(productsData.filteredproductsCount)
+console.log(productsData.count);
 
   return (
     <>
@@ -100,7 +88,6 @@ const Search = () => {
         </div>
         <div className="rating pl-6 py-4 border-t border-b border-gray-200 flex-col">
           <h1 className="text-xl pb-3">Rating</h1>
-
           <ul className='pl-0'>
           {[5,4,3,2,1].map((star)=>(
            <li style={{cursor:'pointer',listStyleType:'none'}} key={star} onClick={()=> setRating(star)}>
@@ -147,8 +134,8 @@ const Search = () => {
           />
         </div>
 
-        <div class="flex flex-col items-center gap-8">
-      <div class="flex flex-wrap gap-5 justify-center">
+        <div className="flex flex-col items-center gap-8">
+      <div className="flex flex-wrap gap-5 justify-center">
           { productsData.products && productsData.products.map((product)=>(
         <Product key={product._id} product={product} />
          ))
@@ -156,116 +143,24 @@ const Search = () => {
      </div>
      
     </div>
-  {productsData.count <= count && (
+  {productsData.count <= productsData.filteredproductsCount && (
     <div className="flex justify-center my-5">
   <Pagination
     activePage={currentPage}
     itemsCountPerPage={productsData.count}
-    totalItemsCount={productsData.productCount}
+    totalItemsCount={productsData.filteredproductsCount}
     onChange={setCurrentPageNo}
     nextPageText={"Next"}
     prevPageText={"Prev"}
     firstPageText={"First"}
     lastPageText={"Last"}
-    itemClass="page-item"
-    linkClass="page-link"
+    itemclassName="page-item"
+    linkclassName="page-link"
   />
 </div>
 )}
       </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-    {/* <div className='col-6 col-md-3 mt-5 mb-5'>
-    <div className='px-5'>
-     <Range
-     marks={{
-       1: "$1",
-       1000: "$1000"
-     }} 
-     min = {1}
-     max = {1000}
-     defaultValue = {[1,1000]}
-     tipFormatter = {value => `$${value}`}
-     tipProps={{
-       placement: "top",
-       visible: true
-     }}
-     value={price}
-     onChange = {(price)=>setPrice(price)} 
-     />
-
-    <hr className='my-5' />
-
-    <div className='mt-5'>
-     <h4 className='mb-3'>
-       Categories
-     </h4>
-     <ul className='pl-0'>
-       {categories.map((category)=>(
-        <li style={{cursor:'pointer',listStyleType:'none'}} key={category} onClick={()=> setCategory(category)}>
-         {category}
-        </li>
-       ))}
-     </ul>
-    </div>
-
-
-    <hr className='my-3' />
-
-    <div className='mt-5'>
-     <h4 className='mb-3'>
-       Ratings
-     </h4>
-     <ul className='pl-0'>
-       {[5,4,3,2,1].map((star)=>(
-        <li style={{cursor:'pointer',listStyleType:'none'}} key={star} onClick={()=> setRatings(star)}>
-         <div className='rating-outer'>
-           <div className='rating-inner' style={{width: `${star * 20}%`}}>
-           </div>
-         </div>
-        </li>
-       ))}
-     </ul>
-    </div>
-
-    </div>
-   </div>
-
-    <div className={`search-bar ${openSearch ? "" : "hidden"} `} >
-    <form onSubmit={searchHandler}>
-      <div className="flex relative items-center">
-        <div className="absolute pl-6"><i class="text-gray-400 fa-solid fa-magnifying-glass"></i></div>
-        <input className="px-14 py-4 w-full" type="text" name="search" id="search" placeholder="Start Typing..."  onChange={(e)=>setKeyword(e.target.value)}/>
-        <div className="absolute right-6"><i class="text-gray-400 fa-solid fa-x" onClick={()=>setOpenSearch(false)}></i></div>
-      </div>
-    </form>
-  </div> */}
-
-    {/* <form onSubmit={searchHandler}>
-        <div className="input-group">
-             <input
-              type="text"
-              id="search_field"
-              className="form-control"
-              placeholder="Enter Product Name ..."
-              onChange={(e)=>setKeyword(e.target.value)}
-            />
-            <div className="input-group-append">
-              <button id="search_btn" className="btn">
-                <i className="fa fa-search" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
-    </form> */}
     </>
   )
 }

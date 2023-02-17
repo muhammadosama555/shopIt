@@ -13,20 +13,20 @@ const cloudinary = require('cloudinary')
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password } = req.body;
 
-  const result = await cloudinary.v2.uploader.upload(req.body.avatar,{
-    folder : 'avatars',
-    width : 150,
-    crop : 'scale'
-  })
+  // const result = await cloudinary.v2.uploader.upload(req.body.avatar,{
+  //   folder : 'avatars',
+  //   width : 150,
+  //   crop : 'scale'
+  // })
 
   const user = await User.create({
     name,
     password,
     email,
-    avatar: {
-      public_id: result.public_id,
-      url: result.secure_url,
-    },
+    // avatar: {
+    //   public_id: result.public_id,
+    //   url: result.secure_url,
+    // },
   });
 
   sendToken(user, 200, res);
@@ -145,7 +145,7 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
     exxpires: new Date(Date.now()),
     httpOnly: true,
   });
-
+console.log('logged out');
   res.status(200).json({
     seccess: true,
     message: "Logged out",
@@ -167,7 +167,7 @@ exports.allUsers= catchAsyncErrors(async (req,res,next)=>{
 
 // get user details
 exports.getUserDetails= catchAsyncErrors(async (req,res,next)=>{
-    const user= await User.findById(re.params.id)
+    const user= await User.findById(req.params.id)
     if(!user){
         return next(new ErrorHandler("user not found"))
     }
@@ -183,7 +183,7 @@ exports.updateUser = catchAsyncErrors(async(req,res,next)=>{
     const newUserData={
         name:req.body.name,
         email:req.body.email,
-        role:role.body.role
+        role:req.body.role
     }
 
 

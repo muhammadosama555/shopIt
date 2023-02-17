@@ -60,6 +60,7 @@ p {
 
 .rating-outer::before {
   content: '\f006 \f006 \f006 \f006 \f006';
+  font-size: 16px;
 }
 
 .rating-inner {
@@ -73,6 +74,7 @@ p {
 
 .rating-inner::before {
   content: '\f005 \f005 \f005 \f005 \f005';
+  font-size: 16px;
   color: #f8ce0b;
 }
 
@@ -94,8 +96,6 @@ p {
 
 /* Pagination */
 
-
-
 .page-item.active .page-link {
   background-color: #fa9c23;
   border-color: #fa9c23;
@@ -113,7 +113,7 @@ p {
 
 .pagination{
   display: flex;
-gap: 10px;
+  gap: 10px;
 }
 
 /* Checkout Steps */

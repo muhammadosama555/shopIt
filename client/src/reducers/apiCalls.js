@@ -44,7 +44,6 @@ import { clearCart, saveShippingInfo } from "./cartReducers";
     dispatch(getProductStart());
     try {
       let url = `/api/v1/products?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&rating[gte]=${ratings}`;
-      console.log(url);
       if (category) {
        url = `/api/v1/products?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&category=${category}&rating[gte]=${ratings}`;
 

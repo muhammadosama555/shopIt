@@ -8,7 +8,6 @@ import {
   removeFromCart,
 } from "../../reducers/cartReducers";
 
-
 const Cart = () => {
   const { products } = useSelector((state) => state.cartSlice);
 
@@ -18,7 +17,7 @@ const Cart = () => {
   const checkoutHandler = () => {
     Navigate("/login/shipping");
   };
- 
+
   return (
     <>
       {products.length === 0 ? (
@@ -57,8 +56,12 @@ const Cart = () => {
                         <div className="flex lg:justify-center xl:justify-center gap-10">
                           <div>
                             <div className="flex items-center gap-4">
-                              <span className="w-8 h-7 rounded-[4px] font-semibold bg-[#c32a2a] text-white flex justify-center hover:cursor-pointer hover:bg-[#ad2626]" 
-                              onClick={()=>dispatch(decreaseQuantity(item._id))}>
+                              <span
+                                className="w-8 h-7 rounded-[4px] font-semibold bg-[#c32a2a] text-white flex justify-center hover:cursor-pointer hover:bg-[#ad2626]"
+                                onClick={() =>
+                                  dispatch(decreaseQuantity(item._id))
+                                }
+                              >
                                 -
                               </span>
                               <input
@@ -67,14 +70,21 @@ const Cart = () => {
                                 value={item.quantity}
                                 readonly
                               />
-                              <span className="w-8 h-7 rounded-[4px] font-semibold bg-[#007bff] text-white flex justify-center hover:cursor-pointer hover:bg-[#0367d2]"
-                               onClick={() => dispatch(increaseQuantity(item._id))}>
+                              <span
+                                className="w-8 h-7 rounded-[4px] font-semibold bg-[#007bff] text-white flex justify-center hover:cursor-pointer hover:bg-[#0367d2]"
+                                onClick={() =>
+                                  dispatch(increaseQuantity(item._id))
+                                }
+                              >
                                 +
                               </span>
                             </div>
                           </div>
                           <div className="text-2xl text-[#c32a2a] hover:cursor-pointer hover:text-[#ad2626]">
-                            <i className="fa-regular fa-trash-can"  onClick={() => dispatch(removeFromCart(item._id))}></i>
+                            <i
+                              className="fa-regular fa-trash-can"
+                              onClick={() => dispatch(removeFromCart(item._id))}
+                            ></i>
                           </div>
                         </div>
                       </div>
@@ -89,17 +99,23 @@ const Cart = () => {
                       <hr />
                       <p>
                         Subtotal:{" "}
-                        <span className="float-right font-semibold">{products.reduce(
-                      (acc, item) => acc + Number(item.quantity),
-                      0
-                    )} (Units)</span>
+                        <span className="float-right font-semibold">
+                          {products.reduce(
+                            (acc, item) => acc + Number(item.quantity),
+                            0
+                          )}{" "}
+                          (Units)
+                        </span>
                       </p>
                       <p>
                         Est. total:{" "}
-                        <span className="float-right font-semibold">${products.reduce(
-                      (acc, item) => acc + item.quantity * item.price,
-                      0
-                    )}</span>
+                        <span className="float-right font-semibold">
+                          $
+                          {products.reduce(
+                            (acc, item) => acc + item.quantity * item.price,
+                            0
+                          )}
+                        </span>
                       </p>
                       <hr />
                       <div className="flex justify-center mt-5 pb-3">
@@ -118,107 +134,6 @@ const Cart = () => {
               </div>
             </div>
           </div>
-
-          {/* <h2 className="mt-5">
-            Your Cart: <b>{products.length} items</b>
-          </h2>
-
-          <div className="row d-flex justify-content-between">
-            <div className="col-12 col-lg-8">
-              <hr />
-              {products.map((item) => (
-                <div className="cart-item" key={item._id}>
-                  <div className="row">
-                    <div className="col-4 col-lg-3">
-                      <img
-                        src={item.images[0].url}
-                        alt="Laptop"
-                        height="90"
-                        width="115"
-                      />
-                    </div>
-
-                    <div className="col-5 col-lg-3">
-                      <Link to={`/products/${item.product}`}>{item.name}</Link>
-                    </div>
-
-                    <div className="col-4 col-lg-2 mt-4 mt-lg-0">
-                      <p id="card_item_price">{item.price}</p>
-                    </div>
-
-                    <div className="col-4 col-lg-3 mt-4 mt-lg-0">
-                      <div className="stockCounter d-inline">
-                        <span
-                          className="btn btn-danger minus"
-                          onClick={() => dispatch(decreaseQuantity(item._id))}
-                        >
-                          -
-                        </span>
-                        <input
-                          type="number"
-                          className="form-control count d-inline"
-                          value={item.quantity}
-                          readOnly
-                        />
-                        <span
-                          className="btn btn-primary plus"
-                          onClick={() => dispatch(increaseQuantity(item._id))}
-                        >
-                          +
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="col-4 col-lg-1 mt-4 mt-lg-0">
-                      <i
-                        id="delete_cart_item"
-                        className="fa fa-trash btn btn-danger"
-                        onClick={() => dispatch(removeFromCart(item._id))}
-                      ></i>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              <hr />
-            </div>
-
-            <div className="col-12 col-lg-3 my-4">
-              <div id="order_summary">
-                <h4>Order Summary</h4>
-                <hr />
-                <p>
-                  Subtotal:{" "}
-                  <span className="order-summary-values">
-                    {products.reduce(
-                      (acc, item) => acc + Number(item.quantity),
-                      0
-                    )}{" "}
-                    (Units)
-                  </span>
-                </p>
-                <p>
-                  Est. total:{" "}
-                  <span className="order-summary-values">
-                    $
-                    {products.reduce(
-                      (acc, item) => acc + item.quantity * item.price,
-                      0
-                    )}
-                  </span>
-                </p>
-
-                <hr />
-                <button
-                  id="checkout_btn"
-                  className="btn btn-primary btn-block"
-                  onClick={checkoutHandler}
-                >
-                  Check out
-                </button>
-              </div>
-            </div>
-          </div> */}
         </>
       )}
     </>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { getProducts } from '../reducers/apiCalls'
 import MetaData from './layout/MetaData'
 import {useDispatch, useSelector} from "react-redux"
@@ -23,14 +23,12 @@ const Home = () => {
 
 
   useEffect(()=>{
-    console.log("hit");
     getProducts(dispatch)
     if (error) {
      alert.error("MY ERROR")
     }
 
   },[dispatch,alert,error])
-console.log(error);
 
   return (
     <>
@@ -38,22 +36,22 @@ console.log(error);
       <>
        <MetaData title={"Buy best produts online"} />
        <Hero/>
-       <section class="best-products my-5 mx-6">
+       <section className="best-products my-5 mx-6">
     <div>
-      <h1 class="text-center text-2xl font-semibold py-8">Best Selling Products</h1>
+      <h1 className="text-center text-2xl font-semibold py-8">Best Selling Products</h1>
     </div>
-    <div class="flex flex-col items-center gap-8">
-      <div class="flex flex-wrap gap-5 justify-center">
+    <div className="flex flex-col items-center gap-8">
+      <div className="flex flex-wrap gap-5 justify-center">
           { productsData.products && productsData.products.map((product)=>(
         <Product key={product._id} product={product} />
          ))
       }
 </div>
-      <div class="flex justify-center items-center md:max-w-[333px] lg:max-w-[333px] xl:max-w-[333px] pb-10 w-full">
-        <button
-          class="text-white text-lg font-semibold bg-red-color w-full py-4 rounded-md hover:bg-[#910811] hover:transition-all"><Link to="/search">EXPLORE
+      <div className="flex justify-center items-center md:max-w-[333px] lg:max-w-[333px] xl:max-w-[333px] pb-10 w-full">
+      <Link to="/search"
+          className="text-white justify-center flex text-lg font-semibold bg-red-color w-full py-4 rounded-md hover:bg-[#910811] hover:transition-all">EXPLORE
           ALL
-          PRODUCTS</Link></button>
+          PRODUCTS</Link>
       </div>
     </div>
   </section>

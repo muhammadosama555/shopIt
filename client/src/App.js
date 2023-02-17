@@ -13,9 +13,6 @@ import UpdatePassword from "./components/user/UpdatePassword";
 import Cart from "./components/cart/Cart";
 import Shipping from "./components/cart/Shipping";
 import ConfirmOrder from "./components/cart/ConfirmOrder";
-import Dashboard from "./components/admin/Dashboard";
-import ProtectedAdminOutlet from "./components/route/ProtectedAdminOutlet";
-import UsersList from "./components/admin/UsersList";
 import Offers from "./components/layout/Offers";
 import "./App.css";
 import Search from "./components/layout/Search";
@@ -41,10 +38,7 @@ function App() {
               <Route path="/login/shipping" element={<Shipping />} />
               <Route path="/order/confirm" element={<ConfirmOrder />} />
             </Route>
-            <Route path="/" element={<ProtectedAdminOutlet />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin/users" element={<UsersList />} />
-            </Route>
+           
           </Routes>
         </div>
         {/* <Routes>

@@ -5,7 +5,7 @@ import Loader from './Loader'
 
 const Hero = () => {
 
-    const {productsData,isFetching,error} = useSelector((state)=>state.productSlice)
+    const {productsData,isFetching} = useSelector((state)=>state.productSlice)
 
   return (
     <>
@@ -35,9 +35,9 @@ const Hero = () => {
           </div>
         </div>
         <div className="hero-items flex justify-center gap-5 py-5 md:max-w-[410px] lg:max-w-2xl">
-        {
+        {productsData.products &&
           productsData.products.slice(0,2).map((product)=>(
-              <div className="card1 card-shadow flex bg-[#fff9ef] py-4 px-8 rounded-md justify-center items-center ">
+              <div className="card1 card-shadow flex bg-[#fff9ef] py-4 px-8 rounded-md justify-center items-center " key={product._id}>
               <Link to={`/product/${product._id}`}><img className="h-28 lg:h-44 xl:h-44 w-full" src={product.images[0].url} alt=""/></Link>
             </div>
            ))
@@ -52,22 +52,22 @@ const Hero = () => {
       </div>
     </section>
 
-    <section class="review mt-5">
-    <div class="flex flex-col md:flex-row lg:flex-row xl:flex-row">
-      <div class="text-center pt-5 px-6">
-        <p class="text-xl">"Lorem ipsum dolor sit amet consectetur adipisicing elit. In culpa nobis molestias saepe
+    <section className="review mt-5">
+    <div className="flex flex-col md:flex-row lg:flex-row xl:flex-row">
+      <div className="text-center pt-5 px-6">
+        <p className="text-xl">"Lorem ipsum dolor sit amet consectetur adipisicing elit. In culpa nobis molestias saepe
           repellat nostrum?"</p>
-        <h3 class="text-3xl font-semibold">Forbes</h3>
+        <h3 className="text-3xl font-semibold">Forbes</h3>
       </div>
-      <div class="text-center pt-5 px-6">
-        <p class="text-xl">"Lorem ipsum dolor sit amet consectetur adipisicing elit. In culpa nobis molestias saepe
+      <div className="text-center pt-5 px-6">
+        <p className="text-xl">"Lorem ipsum dolor sit amet consectetur adipisicing elit. In culpa nobis molestias saepe
           repellat nostrum?"</p>
-        <h3 class="text-3xl font-semibold">Forbes</h3>
+        <h3 className="text-3xl font-semibold">Forbes</h3>
       </div>
-      <div class="text-center pt-5 px-6">
-        <p class="text-xl">"Lorem ipsum dolor sit amet consectetur adipisicing elit. In culpa nobis molestias saepe
+      <div className="text-center pt-5 px-6">
+        <p className="text-xl">"Lorem ipsum dolor sit amet consectetur adipisicing elit. In culpa nobis molestias saepe
           repellat nostrum?"</p>
-        <h3 class="text-3xl font-semibold">Forbes</h3>
+        <h3 className="text-3xl font-semibold">Forbes</h3>
       </div>
 
     </div>
