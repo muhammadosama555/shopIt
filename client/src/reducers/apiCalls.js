@@ -6,9 +6,6 @@ import {
     getProductDetailsStart,
     getProductDetailsSuccess,
     getProductDetailsFailure,
-    getAdminProductStart,
-    getAdminProductSuccess,
-    getAdminProductFailure,
     postReviewsStart,
     postReviewsSuccess,
     postReviewsFailure,
@@ -30,9 +27,6 @@ import { loginStart,
          updatePasswordStart,
          updatePasswordSuccess,
          updatePasswordFailure,
-         getUsersStart,
-         getUsersSuccess,
-         getUsersFailure,
  } from "./userReducers ";
 
  import { persistor } from "../store";
@@ -58,7 +52,7 @@ import { clearCart, saveShippingInfo } from "./cartReducers";
     }
   };
 
-//  get all the products details
+//  get product details
 
   export const getProductsDetails = async (dispatch,id) => {
     dispatch(getProductDetailsStart());
@@ -154,29 +148,6 @@ import { clearCart, saveShippingInfo } from "./cartReducers";
     
   }
 
-  //  get all the (Admin) products details
-
-  export const getAdminProducts = async (dispatch) => {
-    dispatch(getAdminProductStart());
-    try {
-      const res = await axios.get("/api/v1/admin/products");
-      dispatch(getAdminProductSuccess(res.data));
-    } catch (error) {
-      dispatch(getAdminProductFailure());
-    }
-  };
-
-  //  get all users
-
-  export const getAllUsers = async (dispatch) => {
-    dispatch(getUsersStart())
-    try {
-      const res = await axios.get("/api/v1/admin/users")
-      dispatch(getUsersSuccess((res.data)))
-    } catch (error) {
-      dispatch(getUsersFailure())
-    }
-  } 
 
   // user to post reviews
 

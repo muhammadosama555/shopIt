@@ -2,7 +2,6 @@ import {createSlice} from "@reduxjs/toolkit";
 const userSlice = createSlice({
     name: "userSlice",
     initialState: {
-        users : [],
         currentUser: null,
         isFetching: false,
         error: false,
@@ -90,29 +89,6 @@ const userSlice = createSlice({
           state.isFetching = false;
            state.error = true            
         },
-        getUsersStart: (state) => {
-          state.isFetching = true;
-          
-        },
-        getUsersSuccess: (state,action) => {
-          state.isFetching = false;
-          state.users = action.payload
-        },
-        getUsersFailure: (state) => {
-          state.isFetching = false
-          state.error = true
-        },
-        deleteUser: (state,action) => {
-          state.users.users = state.users.users.filter(user => user._id !== action.payload);         
-        },
-        updateUser: (state,action) => {
-          state.users = state.users.map(user => {
-            if (user._id === action.payload.id) {
-              return action.payload;
-            }
-            return user;
-          });
-        },           
         
     }
 })
@@ -137,10 +113,5 @@ export const {
               updatePasswordSuccess,
               updatePasswordReset,
               updatePasswordFailure,
-              getUsersStart,
-              getUsersSuccess,
-              getUsersFailure,
-              deleteUser,
-              updateUser,
             } = userSlice.actions
 export default userSlice.reducer

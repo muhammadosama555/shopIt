@@ -66,7 +66,7 @@ const ProductDetails = () => {
       {isFetching ? (
         <Loader />
       ) : (
-        productsDetails.product !== "undefined" && (
+        productsDetails.product && (
           <>
             <MetaData title={productsDetails.product.name} />
             <div className="product-details mx-6 my-4">
