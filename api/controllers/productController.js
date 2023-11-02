@@ -1,177 +1,198 @@
-const product = require("../models/product.js")
-const Product=require("../models/product.js")
-const ErrorHandler= require("../utils/errorHandler.js")
-const catchAsyncErrors=require('../middlewares/catchAsyncError.js')
-const mongoose = require("mongoose")
-const APIFeatures = require("../utils/apiFeatures.js")
+const Product = require('../models/product');
+const asyncHandler=require('../middlewares/asyncHandler')
+const ErrorResponse= require("../utils/errorResponse")
+const jwt = require('jsonwebtoken');
+const sharp = require("sharp");
+const cloudinary = require("../config/cloudinary");
 
 
-//Create new peoduct =>    /api/v1/product/new
-exports.newProduct= catchAsyncErrors( async (req,res,next)=>{
-req.body.user= req.user.id
-
-    const product= await  Product.create(req.body)
-    res.status(201).json({
-        success:true,
-        product
-    })
-})
-
-
-// GET ALL PRODUCTS => /api/v1/products
-exports.getProducts=async (req,res,next)=>{
+// Create a New Product
+exports.newProduct = asyncHandler(async (req, res, next) => {
+  const { name, description, price, category, stock } = req.body;
+  
+    // Get the authorization header from the request
+    const authHeader = req.headers.authorization;
+    // If the authorization header doesn't exist, return an error
+    if (!authHeader) {
+      return next(new ErrorResponse('Authorization header missing', 401));
+    }
+    // Extract the token from the authorization header
+    const token = authHeader.split(' ')[1];
+    // Verify the token to get the user ID
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     
-       const resPerPage=4;
-       const productCount=await Product.countDocuments();
-
-       const apiFeatures= new  APIFeatures(Product.find(),req.query )
-                          .search()
-                          .filter()
-                        
-                          let products= await apiFeatures.query.clone();
-                          let filteredproductsCount = products.length
-                          apiFeatures.pagination(resPerPage)
-                          products= await apiFeatures.query;
-                      
-                          res.status(200).json({
-                              success: true,
-                              productCount,
-                              filteredproductsCount,
-                              count:resPerPage,
-                              products,
-                              
-                          })
-}
-
-// GET ALL PRODUCTS (Admin) => /api/v1/admin/products
-exports.getAdminProducts=async (req,res,next)=>{
+    const userId = decodedToken.id;
     
-        products= await Product.find();
+    const images = [];
+   
+    if (req.files) {
+        for (const file of req.files) {
+            const processedImage = await sharp(file.buffer)
+                .resize(500, 500)
+                .jpeg({ quality: 70 })
+                .toBuffer();
 
-    res.status(200).json({
-        success: true,
-        products
-      
-    })
-}
+            const dataURI = `data:image/jpeg;base64,${processedImage.toString('base64')}`;
 
-//Get single product => /api/v1/products/id
-exports.getSingleProduct=async (req,res,next)=>{
-    let product = null;
-    mongoose.Types.ObjectId.isValid(req.params.id) && (product = await Product.findById(req.params.id))
-    if(!product){ 
-        return next( new ErrorHandler("product not found",404))
-        
+            const result = await cloudinary.uploader.upload(dataURI, {
+                resource_type: 'image',
+                format: 'jpg',
+                public_id: `${userId}_${Date.now()}`,
+            });
+
+            images.push({ public_id: result.public_id, url: result.secure_url });
+        }
     }
-    return res.status(200).json({
-        success:true,
-        product
-    })
-}
+  console.log(images)
 
-//Update Product =>  /api/v1/products/id
-
-exports.updateProduct= async (req,res,next)=>{
-    const product =await Product.findByIdAndUpdate(req.params.id,req.body,{new:true})
-    if(!product){
-        return res.status(404).json({
-            seccess:false,
-            message: "Product not found"
-        })
-    }
-    return res.status(200).json(product)
-}
-//Delete Product =>  /api/v1/products/id
-
-exports.deleteProduct= async (req,res,next)=>{
-    const product =await Product.findByIdAndDelete(req.params.id)
-    if(!product){
-        return res.status(404).json({
-            seccess:false,
-            message: "Product not found"
-        })
-    }
-    return res.status(200).json("product has been deleted")
-}
-
-
-
-//Create new review => /api/v1/review
-exports.createProductReview = catchAsyncErrors(async (req,res,next)=>{
-    const {rating,comment, productId}= req.body;
-
-    const review={
-        user: req.user._id,
-        name: req.user.name,
-        rating: Number(rating),
-        comment
-    }
-
-    const product = await Product.findById(productId);
-
-    const isReviewed = product.reviews.find(
-        r => r.user.toString() === req.user._id.toString()
-    )
-
-    if(isReviewed){
-        product.reviews.forEach(review =>{
-            if(review.user.toString() === req.user._id.toString()){
-                review.comment= comment;
-                review.rating= rating
-            }
-        })
-
-    }else{
-        product.reviews.push(review)
-        product.numOfReviews= product.reviews.length
-    }
-
-    product.rating = product.reviews.reduce((acc,item)=>item.rating + acc,0) / product.
-    reviews.length
-
-    await product.save({ validateBeforeSave:false})
-
-    res.status(200).json({
-        success:true
-    })
-
-})
-
-
-//Get Product  review  => /api/v1/reviews
-
-exports.getProductreviews= catchAsyncErrors(async (req,res,next)=>{
-    const product = await Product.findById(req.params.id)
-
-    res.status(200).json({
-        success:true,
-        reviews: product.reviews
-    })
-})
-//delete Product  review  => /api/v1/reviews
-
-exports.deleteProductreviews= catchAsyncErrors(async (req,res,next)=>{
-    const product = await Product.findById(req.query.productId)
+    const product = new Product({
+        name,
+        description,
+        price,
+        category,
+        stock,
+        images, // Use the Cloudinary URL here
+      });
     
-    const reviews = product.reviews.filter(review => review._id.toString() !== req.query.id.toString())
     
-    const numOfReviews= reviews.length
+    const savedProduct = await product.save();
+  
 
-    const ratings=product.reviews.reduce((acc,item)=> item.rating + acc,0) /product.
-    reviews.length
+  res.status(201).json({
+    success: true,
+    product: savedProduct,
+  });
+});
 
-    await Product.findByIdAndUpdate(req.query.id,{
-        reviews,
-        ratings,
-        numOfReviews
-    },{
-        new:true,
-        runValidators:true,
-        useFindAndModify:false
-    })
+// Get All Products
+exports.getAllProducts = asyncHandler(async (req, res, next) => {
+    const { category, search, sortBy, page, limit, maxRating } = req.query;
+  
+    // Parse page and limit parameters
+    const parsedPage = parseInt(page, 10) || 1;
+    const parsedLimit = parseInt(limit, 10) || 4;
+    const skip = (parsedPage - 1) * parsedLimit;
+  
+    let query = Product.find();
+  
+    if (category) {
+        // Filter products by the selected category
+        query = query.where({ category: category });
+    }
+  
+  if (search) {
+    query = query.find({ name: { $regex: search, $options: 'i' } });
+  }
+  
 
+    if (maxRating) {
+      // Filter businesses with a maximum rating
+      query = query.where({
+        'averageRating': { $lte: parseInt(maxRating) }
+      });
+    }
+  
+    let sortOptions = {};
+  
+    if (sortBy === 'name') {
+      sortOptions.name= 1;
+    } else if (sortBy === '-name') {
+      sortOptions.name = -1;
+    }
+  
+    const totalProducts = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalProducts / parsedLimit);
+  
+    query = query.sort(sortOptions).skip(skip).limit(parsedLimit) .populate({
+      path: 'reviews',
+      populate: {
+        path: 'user',
+        select: 'username imgUrl', // Select the fields you want to populate
+      }
+    });
+  
+    const products = await query.exec();
+  
+    const pagination = {};
+  
+    if (skip > 0) {
+      pagination.previous = {
+        page: parsedPage - 1,
+        limit: parsedLimit,
+      };
+    }
+  
+    if (skip + parsedLimit < totalProducts) {
+      pagination.next = {
+        page: parsedPage + 1,
+        limit: parsedLimit,
+      };
+    }
+  
     res.status(200).json({
-        success:true,
-        
-    })
-})
+      success: true,
+      page: parsedPage,
+      limit: parsedLimit,
+      totalPages,
+      totalProducts,
+      pagination,
+      products,
+    });
+  });
+  
+
+// Get Single Product
+exports.getSingleProduct = asyncHandler(async (req, res, next) => {
+  const product = await Product.findById(req.params.id) .populate({
+    path: 'reviews',
+    populate: {
+      path: 'user',
+      select: 'username imgUrl', // Select the fields you want to populate
+    }
+  });
+
+  if (!product) {
+    return next(new ErrorHandler('Product not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    product,
+  });
+});
+
+// Update Product
+exports.updateProduct = asyncHandler(async (req, res, next) => {
+  let product = await Product.findById(req.params.id);
+
+  if (!product) {
+    return next(new ErrorHandler('Product not found', 404));
+  }
+
+
+  product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    product,
+  });
+});
+
+// Delete Product
+exports.deleteProduct = asyncHandler(async (req, res, next) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    return next(new ErrorHandler('Product not found', 404));
+  }
+
+  await product.remove();
+
+  res.status(200).json({
+    success: true,
+    message: 'product deleted',
+  });
+});

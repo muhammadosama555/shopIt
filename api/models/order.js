@@ -29,75 +29,28 @@ const orderSchema = mongoose.Schema({
     required:true,
     ref: "User" 
    },
-   orderItems: [
+   itemsOrderd: [
       {
-          name: {
-            type:String,
-            required:true
-          },
-          quantity: {
-            type:Number,
-            required:true
-          },
-          image: {
-            type:String,
-            
-          },
-          price: {
-            type:Number,
-            required:true
-          },
-          product: {
-            type:mongoose.Schema.Types.ObjectId,
-            required:true,
-            ref: "Product" 
-           },
-      }
-   ],
-   paymentInfo: {
-       id:{
-        type:String
-       },
-       status:{
-        type:String
-       },
-   },
-   paidAt:{
-     
-    type:Date
-
-   },
-   itemsPrice : {
-    type : Number,
-    required : true,
-    default:0.0
-   },
-   taxPrice : {
-    type : Number,
-    required : true,
-    default:0.0
-   },
-   shippingPrice : {
-    type : Number,
-    required : true,
-    default:0.0
-   },
-    totalPrice : {
-    type : Number,
-    required : true,
-    default:0.0
-   },
-   orderStatus:{
-    type:String,
-    required:true,
-    default:"processing"
-   },
-   deliveredAt:{
-    type:Date
-   },
-   createdAt:{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Product', // Reference to the Product model
+        required: true,
+      },
+    ],
+   totalAmount: {
+      type: Number,
+      required: true,
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'completed'],
+      default: 'pending',
+    },
+    quantity:{
+      type: Number,
+      required: true,
+    },   createdAt:{
     type: Date,
-    default:Date.now
+    default: Date.now
    }
 })
 

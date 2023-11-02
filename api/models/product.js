@@ -19,7 +19,7 @@ const productSchema= new mongoose.Schema({
         type:String,
         required:[true,"please enter product description"],
         },
-    rating:{
+    averageRating:{
         type:Number,
         default:0
         },
@@ -35,11 +35,16 @@ const productSchema= new mongoose.Schema({
                 },
             }
         ],
+        reviews: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Review'
+            }
+        ],
         category:{
-            type:String,
-            required:[true,"Please select the category"],
-            enum:{
-                values: [
+            type: String,
+            required:true,
+            enum: [
                     "Electronics",
                     "Cameras",
                     "Laptops",
@@ -50,12 +55,7 @@ const productSchema= new mongoose.Schema({
                     "Sports",
                     "Accessories"
                 ],
-                message: "please select correct category"
-            }
-        },
-        seller:{
-            type:String,
-            required: [true, "Please enter product  seller "]
+            
         },
         stock:{
             type:Number,
@@ -63,31 +63,7 @@ const productSchema= new mongoose.Schema({
             maxLength: [5,"product name cannot exceed 5 letters"],
             default:0
         },
-        numOfReviews:{
-            type: Number,
-            default:0
-        },
-        reviews:[
-            {
-                name:{
-                    type:String,
-                    required:true
-                },
-                rating:{
-                    type:Number,
-                    required:true
-                },
-                comment:{
-                    type:String,
-                    required:true
-                },
-            }
-        ],
-        user:{
-            type:mongoose.Schema.ObjectId,
-            ref: "User",
-            required:true
-        },
+       
         createdAt:{
             type: Date,
             default: Date.now

@@ -1,41 +1,43 @@
-const app = require("./app");
+const express = require("express");
 const dotenv = require("dotenv");
-const connectDatabase = require("./config/database");
+const cors = require("cors");
+const errorHandler = require("./middlewares/error");
+const connectDB = require("./config/db.js");
 
-//HANDLE uncaught exceptions 
-process.on("uncaughtException", (err) => {
-  console.log(`Error: ${err.message}`);
-  console.log("Shutting down server due to uncaught exception")
-  process.exit(1);
+//Load env variables
+dotenv.config({ path: "./config/config.env" });
 
-});
+//database connected
+connectDB();
 
+const app = express();
+//body Parser
+app.use(express.json());
+//cors
+app.use(cors());
 
-
-//Setting up config file
-dotenv.config({ path: "config/config.env" });
-const cloudinary= require("cloudinary")
-
-//Connecting to Database
-connectDatabase();
-
-// setting up cloudinary configration
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-})
-
-const server=app.listen(process.env.PORT || 4000, () => {
-  console.log(
-    `server Started on PORT:${process.env.PORT} in ${process.env.NODE_ENV} MODE.`
-  );
-});
+//Routes files
+const authRoutes = require("./routes/auth.js");
+const userRoutes = require("./routes/user.js");
+const productRoutes = require("./routes/product.js");
+const reviewRoutes = require("./routes/review.js");
+const orderRoutes = require("./routes/order.js");
 
 
-//Handle Unhandled  Promise rejections
-process.on("unhandledRejection", err =>{
-    console.log(`Error: ${err.message}`);
-    console.log("Shutting down the server dueto unhandled promise rejections")
-    server.close(() => process.exit(1));
-})
+//Mount the routers
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/orders", orderRoutes);
+
+
+
+app.use(errorHandler);
+
+const PORT = process.env.PORT 
+
+app.listen(
+  PORT,
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
+);
