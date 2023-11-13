@@ -1,27 +1,21 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import App from './App';
-import {Provider} from "react-redux"
-import {store,persistor} from './store';
-import { PersistGate } from 'redux-persist/integration/react';
-import {positions,transitions,Provider as AlertProvider} from "react-alert"
-import AlertTemplate from "react-alert-template-basic"
 import './main.css';
+import {Provider} from "react-redux"
+import {store,persistor} from './redux/store.js';
+import { PersistGate } from 'redux-persist/integration/react';
 
-const options = {
-   timeout:5000,
-   position:positions.BOTTOM_CENTER,
-   transition:transitions.SCALE
-}
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-   <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      <AlertProvider template={AlertTemplate} {...options}>
-       <App />
-       </AlertProvider>
-    </PersistGate>
-   </Provider>
-);
+ReactDOM.render(
+   <React.StrictMode>
+    <Provider store={store}>
+     <PersistGate loading={null} persistor={persistor}>
+     <App />
+     </PersistGate>
+    </Provider>
+   </React.StrictMode>,
+   document.getElementById('root')
+ );
+ 
 

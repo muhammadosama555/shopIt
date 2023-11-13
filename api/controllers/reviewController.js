@@ -136,11 +136,21 @@ exports.deleteReview = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('No review found with the provided ID', 404));
     }
 
-    
+    // Get the product associated with the review
+    const product = await Product.findById(review.product);
 
-    review = await review.remove();
+    if (!product) {
+        return next(new ErrorResponse('Product not found', 404));
+    }
 
+    // Remove the review ID from the product's reviews array
+    product.reviews = product.reviews.filter((reviewId) => reviewId.toString() !== req.params.id);
 
+    // Save the updated product
+    await product.save();
+
+    // Delete the review from the database
+    await review.remove();
 
     res.status(200).json({
         success: true,

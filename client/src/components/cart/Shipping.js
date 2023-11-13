@@ -1,40 +1,49 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { userShippingInfo } from "../../reducers/apiCalls";
-import MetaData from "../layout/MetaData";
 import { countries } from "countries-list";
 import { useNavigate } from "react-router-dom";
 import CheckoutSteps from "./CheckoutSteps";
+import { saveShippingInfo } from "../../redux/reducers/cartReducers";
 
 const Shipping = () => {
+  
   const countriesList = Object.values(countries);
+
+  const { currentUser } = useSelector((state) => state.userSlice);
+  const userId = currentUser?.data._id
 
   const { shippingInfo } = useSelector((state) => state.cartSlice);
 
-  const [address, setAddress] = useState(shippingInfo.address);
-  const [city, setCity] = useState(shippingInfo.city);
-  const [postalCode, setPostalCode] = useState(shippingInfo.postalCode);
-  const [phoneNo, setPhoneNo] = useState(shippingInfo.phoneNo);
-  const [country, setCountry] = useState(shippingInfo.country);
+  const [address, setAddress] = useState(shippingInfo[userId]?.address || "");
+  const [city, setCity] = useState(shippingInfo[userId]?.city || "");
+  const [postalCode, setPostalCode] = useState(shippingInfo[userId]?.postalCode || "");
+  const [phoneNo, setPhoneNo] = useState(shippingInfo[userId]?.phoneNo);
+  const [country, setCountry] = useState(shippingInfo[userId]?.country || "");
   const dispatch = useDispatch();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const submitHandler = (e) => {
+  const shippingInfoHandler = (e) => {
     e.preventDefault();
-    const info = { address, city, postalCode, phoneNo, country };
-    userShippingInfo(dispatch, info);
-    Navigate("/order/confirm");
+    const shippingInfo = {
+      address,
+      city,
+      postalCode,
+      phoneNo,
+      country,
+    };
+    dispatch(saveShippingInfo({ shippingInfo, userId }))
+    navigate('/order/confirmOrder')
   };
   //console.log(shippingInfo)
 
   return (
     <>
-      <MetaData title={"shipping Info"} />
+    
       <CheckoutSteps shipping="shipping" />
 
       <div className="shipping wrapper flex justify-center items-center mt-20 box-border">
         <div className="w-full lg:w-2/5 xl:w-2/5 bg-white shadow-xl px-8 pt-14 pb-10 mx-14  rounded-md">
-          <form className="flex w-full flex-col gap-5" onSubmit={submitHandler}>
+          <form className="flex w-full flex-col gap-5" onSubmit={shippingInfoHandler}>
             <h1 className="text-4xl font-semibold pb-5">Shipping Info</h1>
             <div className="flex flex-col ">
               <label className="text-xl pb-2" for="address_field">

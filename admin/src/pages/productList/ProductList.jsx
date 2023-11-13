@@ -2,52 +2,54 @@ import "./productList.css";
 import { DataGrid } from "@material-ui/data-grid";
 import { DeleteOutline } from "@material-ui/icons";
 import { Link } from "react-router-dom";
-import { useEffect} from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { DeleteProduct, getProducts } from "../../reducers/apiCalls";
+import { useDeleteProduct, useGetProducts } from "../../apiCalls/productApiCalls";
+import Loader from '../../components/Loader'
 
 export default function ProductList() {
+  const {isLoading:isProductsLoading, data:products, isError:isProductsError, error:productsError} = useGetProducts()
+  const {mutate:deleteProductMutate, isLoading:isDeleteProductLoading, isError:isDeleteProductError, error:deleteProductError} = useDeleteProduct();
 
-  const {productsData} = useSelector(
-    (state) => state.productSlice
-  );
+  if (isProductsLoading) {
+    return <Loader/>
+  }
+  
+  if (isProductsError) {
+    return <h2>{productsError.message}</h2>
+  }
 
-  const dispatch = useDispatch()
-
-  useEffect(()=>{
-    getProducts(dispatch)
-  },[dispatch])
-
-
-  const handleDelete = (id) => {
-    console.log(id);
-     DeleteProduct(dispatch,id)
+  if (isDeleteProductLoading) {
+    return <Loader/>
+  }
+  
+  if (isDeleteProductError) {
+    return <h2>{deleteProductError.message}</h2>
+  }
+  
+    const handleDelete = (productId) => {
+      deleteProductMutate(productId)
     };
+  console.log(products?.data)
 
   const columns = [
     { field: "_id", headerName: "ID", width: 90 },
     {
-      field: "product",
-      headerName: "Product",
+      field: "name",
+      headerName: "Name",
       width: 200,
       renderCell: (params) => {
         return (
           <div className="productListItem">
-            <img className="productListImg" src={params.row.img} alt="" />
+            <img className="productListImg" src={params.row.images[0].url} alt="" />
             {params.row.name}
           </div>
         );
       },
     },
-    { 
-      field: "stock",
-     headerName: "Stock",
-      width: 160
-     },
+    { field: "stock", headerName: "Stock", width: 200 },
     {
       field: "category",
       headerName: "Category",
-      width: 200,
+      width: 120,
     },
     {
       field: "price",
@@ -76,9 +78,14 @@ export default function ProductList() {
 
   return (
     <div className="productList">
+        <div style={{ padding: "10px 0px" }}>
+        <Link to="/newProduct">
+          <button className="userAddButton">Create</button>
+        </Link>
+      </div>
       <DataGrid
-        rows={productsData.products}
-        getRowId={(row) => row._id}
+       rows={products?.data.products}
+       getRowId={(row) => row._id}
         disableSelectionOnClick
         columns={columns}
         pageSize={8}

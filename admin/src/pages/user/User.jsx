@@ -6,136 +6,142 @@ import {
   PhoneAndroid,
   Publish,
 } from "@material-ui/icons";
-import { Link } from "react-router-dom";
-import { getUserDetails,updateUser } from "../../reducers/apiCalls";
-import { useSelector , useDispatch} from "react-redux";
-import { useLocation } from "react-router-dom";
-
+import { Link, useParams } from "react-router-dom";
 import "./user.css";
-import { useEffect } from "react";
-import { useState } from "react";
-import { updateReset } from "../../reducers/userReducers ";
+import { useRef } from "react";
+import { useGetUserDetails, useUpdateProfile, useUpdateUserImage } from "../../apiCalls/userApiCalls";
+import Loader from "../../components/Loader";
+import { useSelector } from "react-redux";
 
 export default function User() {
 
-const [formData,setFormData] = useState({})
-  const location = useLocation();
-  const id = location.pathname.split("/")[2];
+  const usernameInputElement = useRef();
+  const emailInputElement = useRef();
 
-  const { userDetails,isUpdated } = useSelector(
-    (state) => state.userSlice
-  );
- 
-  const userData = userDetails.user
-  const dispatch = useDispatch();
+  const { userId } = useParams()
 
 
-  useEffect(() => {
-    getUserDetails(dispatch, id);
-    console.log(userDetails,id);
-    if (isUpdated) {
-      dispatch(updateReset())
-  }
-  }, [dispatch,isUpdated]);
+  const { isLoading: isUserLoading, data: userDetails } = useGetUserDetails(userId)
+  const { mutate: updateUserImageMutate, isLoading: isUpdateUserImageLoading, isError: isUpdateUserImageError, error: updateUserImageError, } = useUpdateUserImage();
+  console.log(userDetails?.data)
+  const {
+      mutate: updateProfileMutate,
+      isLoading: isUpdateProfileLoading,
+      isError: isUpdateProfileError,
+      error: updateProfileError,
+    } = useUpdateProfile();
+  
+    const handleSubmit = (event) => {
+      event.preventDefault();
+      const data = {
+        username: usernameInputElement.current?.value,
+        email: emailInputElement.current?.value,
+        userId: userId,
+      };
+
+      console.log(data)
+      updateProfileMutate(data);
+   
+    };
+
+    const handleFileChange = (e) => {
+      const imageData = {
+        userId: userId,
+        image: e.target.files[0],
+      };
+      updateUserImageMutate(imageData);
+    };
 
 
-
-  const submitHandler = (e) => {
-    e.preventDefault();
-    updateUser(dispatch, formData,id);
-
-  };
-
-  const handleTextChange = e => {
-    setFormData({ ...formData, [e.target.name]: e.target.value});
-  };
-
+  const fallbackImage = '/images/avatar.jpg';
 
   return (
+    <>
+    {isUserLoading ? <Loader/> :
     <div className="user">
       <div className="userTitleContainer">
         <h1 className="userTitle">Edit User</h1>
-        <Link to="/newUser">
-          <button className="userAddButton">Create</button>
-        </Link>
+        
       </div>
       <div className="userContainer">
+       
         <div className="userShow">
           <div className="userShowTop">
             <img
-              src="https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
+            src={userDetails?.data?.user?.imgUrl || fallbackImage} 
               alt=""
               className="userShowImg"
             />
             <div className="userShowTopTitle">
-              <span className="userShowUsername">{userData.name}</span>
+              <span className="userShowUsername">{userDetails.data.user.username}</span>
+              
             </div>
           </div>
           <div className="userShowBottom">
             <span className="userShowTitle">Account Details</span>
-            
+            <div className="userShowInfo">
+              <PermIdentity className="userShowIcon" />
+              <span className="userShowInfoTitle">{userDetails.data.user.username}</span>
+            </div>
             <div className="userShowInfo">
               <CalendarToday className="userShowIcon" />
-              <span className="userShowInfoTitle">{userData.createdAt}</span>
+              <span className="userShowInfoTitle">{userDetails.data.user.createdAt}</span>
             </div>
+            <span className="userShowTitle">Contact Details</span>
             <div className="userShowInfo">
               <MailOutline className="userShowIcon" />
-              <span className="userShowInfoTitle">{userData.email}</span>
+              <span className="userShowInfoTitle">{userDetails.data.user.email}</span>
             </div>
+           
           </div>
         </div>
         <div className="userUpdate">
           <span className="userUpdateTitle">Edit</span>
-          <form className="userUpdateForm" onSubmit={submitHandler}>
+          <form onSubmit={handleSubmit} className="userUpdateForm">
             <div className="userUpdateLeft">
               <div className="userUpdateItem">
                 <label>Username</label>
                 <input
                   type="text"
+                  ref={usernameInputElement}
+                  defaultValue={userDetails.data.user.username}
                   className="userUpdateInput"
-                  placeholder={userData.name}
-                  name="name"
-                  onChange={handleTextChange}
                 />
               </div>
+             
               <div className="userUpdateItem">
                 <label>Email</label>
                 <input
                   type="text"
+                  ref={emailInputElement}
+                  defaultValue={userDetails.data.user.email}
                   className="userUpdateInput"
-                  placeholder={userData.email}
-                  name="email"
-                  onChange={handleTextChange}
                 />
               </div>
-              <div className="userUpdateItem">
-                <label>Role</label>
-                <input
-                  type="text"
-                  className="userUpdateInput"
-                  placeholder={userData.role}
-                  name="role"
-                  onChange={handleTextChange}
-                />
-              </div>
+             
             </div>
             <div className="userUpdateRight">
               <div className="userUpdateUpload">
                 <img
                   className="userUpdateImg"
-                  src="https://images.pexels.com/photos/1152994/pexels-photo-1152994.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
-                  alt=""
+                  src={userDetails?.data?.user?.imgUrl || fallbackImage} alt=""
                 />
                 <label htmlFor="file">
                   <Publish className="userUpdateIcon" />
                 </label>
-                <input type="file" id="file" style={{ display: "none" }} />
+                <input
+                 type="file"
+                  id="file"
+                   style={{ display: "none" }}
+                   onChange={handleFileChange}
+                    />
               </div>
               <button className="userUpdateButton">Update</button>
             </div>
           </form>
         </div>
       </div>
-    </div>
+    </div>}
+    </>
   );
 }

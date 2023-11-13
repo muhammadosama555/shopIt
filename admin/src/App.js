@@ -3,26 +3,30 @@ import Topbar from "./components/topbar/Topbar";
 import "./App.css";
 import Home from "./pages/home/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/login/Login";
+import { QueryClientProvider,QueryClient } from 'react-query'
+import { ReactQueryDevtools } from 'react-query/devtools'
+import { useSelector } from "react-redux";
 import UserList from "./pages/userList/UserList";
 import User from "./pages/user/User";
 import NewUser from "./pages/newUser/NewUser";
 import ProductList from "./pages/productList/ProductList";
 import Product from "./pages/product/Product";
 import NewProduct from "./pages/newProduct/NewProduct";
-import Login from "./pages/login/Login";
-import { useSelector } from "react-redux";
+
+const queryClient = new QueryClient()
 
 function App() {
-  const {currentUser } = useSelector(
-    (state) => state.userSlice
-  );
 
-// console.log(currentUser.user.role);
+  const { currentUser } = useSelector((state) => state.userSlice);
+
+  console.log(currentUser?.data)
 
   return (
     <>
+      <QueryClientProvider client={queryClient}>
     <BrowserRouter>
-    {currentUser ? ( 
+    {currentUser?.data.role === 'admin'  ? ( 
     <>
     <Topbar />
           <div className="container">
@@ -42,49 +46,11 @@ function App() {
       <Login />
     )
     }
-          
+  
   </BrowserRouter>
+  <ReactQueryDevtools intialIsOpen={false} position="bottom-right" />
+  </QueryClientProvider>
 
-
-
-
-    {/* <Router>
-    <Switch>
-    <Route path="/login">
-     <Login />
-      </Route>
-      {admin && (
-        <>
-        <Topbar />
-    <div className="container">
-      <Sidebar />
-        <Route exact path="/">
-          <Home />
-        </Route>
-        <Route path="/users">
-          <UserList />
-        </Route>
-        <Route path="/user/:userId">
-          <User />
-        </Route>
-        <Route path="/newUser">
-          <NewUser />
-        </Route>
-        <Route path="/products">
-          <ProductList />
-        </Route>
-        <Route path="/product/:productId">
-          <Product />
-        </Route>
-        <Route path="/newproduct">
-          <NewProduct />
-        </Route>
-    </div>
-        </>
-      )}
-    
-    </Switch>
-  </Router> */}
   </>
   );
 }

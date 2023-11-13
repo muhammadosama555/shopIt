@@ -6,11 +6,11 @@ const Product = ({product}) => {
     <>
        <div className="product card-shadow flex flex-col items-center text-center rounded-md w-40 md:min-w-[170px] lg:min-w-[200px] xl:min-w-[200px] hover:transition-all hover:scale-110">
           <div className="product-display py-4">
-            {/* <img className="h-24 md:h-32 lg:h-40 xl:h-40" src={product.images[0].url} alt="card"/> */}
+            <img className="h-24 md:h-32 lg:h-40 xl:h-40" src={product.images[0].url} alt="card"/>
           </div>
           <div className="ratings mt-auto">
           <div className="rating-outer">
-            <div className="rating-inner" style={{width: `${(product.rating/5)*100}%`}}></div>
+            <div className="rating-inner" style={{width: `${(product.averageRating/5)*100}%`}}></div>
           </div>
           </div>
           <div className="product-name">

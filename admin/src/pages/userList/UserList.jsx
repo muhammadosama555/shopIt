@@ -2,40 +2,48 @@ import "./userList.css";
 import { DataGrid } from "@material-ui/data-grid";
 import { DeleteOutline } from "@material-ui/icons";
 import { Link } from "react-router-dom";
-import { useSelector , useDispatch} from "react-redux";
-import { DeleteUser, getUsers } from "../../reducers/apiCalls";
-import { useEffect } from "react";
+import { useState } from "react";
+import { useDeleteUser, useGetUsers } from "../../apiCalls/userApiCalls";
+import Loader from '../../components/Loader'
+
 
 export default function UserList() {
-
-  const {users,isCreated} = useSelector(
-    (state) => state.userSlice
-  );
-
-  const dispatch = useDispatch()
-
-  useEffect(()=>{
-  getUsers(dispatch)
-  },[dispatch,isCreated])
-
-
-
-  const handleDelete = (id) => {
-  console.log(id);
-   DeleteUser(dispatch,id)
-  };
   
+  const {isLoading:isUsersLoading, data:users, isError:isUsersError, error:usersError} = useGetUsers()
+  const {mutate:deleteUserMutate, isLoading:isDeleteUserLoading, isError:isDeleteUserError, error:deleteUserError} = useDeleteUser();
+
+  if (isUsersLoading) {
+    return <Loader/>
+  }
   
+  if (isUsersError) {
+    return <h2>{usersError.message}</h2>
+  }
+
+  if (isDeleteUserLoading) {
+    return <Loader/>
+  }
+  
+  if (isDeleteUserError) {
+    return <h2>{deleteUserError.message}</h2>
+  }
+  
+    const handleDelete = (userId) => {
+       deleteUserMutate(userId)
+    };
+  console.log(users?.data)
+  const fallbackImage = '/images/avatar.jpg';
+
   const columns = [
     { field: "_id", headerName: "ID", width: 90 },
     {
-      field: "user",
-      headerName: "User",
+      field: "username",
+      headerName: "Name",
       width: 200,
       renderCell: (params) => {
         return (
           <div className="userListUser">
-            <img className="userListImg" src={params.row.avatar} alt="" />
+            <img className="userListImg" src={params.row.imgUrl ? params.row.imgUrl : fallbackImage} alt="" />
             {params.row.username}
           </div>
         );
@@ -43,13 +51,13 @@ export default function UserList() {
     },
     { field: "email", headerName: "Email", width: 200 },
     {
-      field: "status",
-      headerName: "Status",
+      field: "role",
+      headerName: "Role",
       width: 120,
     },
     {
-      field: "transaction",
-      headerName: "Transaction Volume",
+      field: "createdAt",
+      headerName: "created on",
       width: 160,
     },
     {
@@ -64,7 +72,7 @@ export default function UserList() {
             </Link>
             <DeleteOutline
               className="userListDelete"
-              onClick={() => handleDelete(params.row._id)}
+             onClick={() => handleDelete(params.row._id)}
             />
           </>
         );
@@ -74,8 +82,13 @@ export default function UserList() {
 
   return (
     <div className="userList">
+      <div style={{ padding: "10px 0px" }}>
+        <Link to="/newUser">
+          <button className="userAddButton">Create</button>
+        </Link>
+      </div>
       <DataGrid
-        rows={users.users}
+        rows={users?.data.users}
         getRowId={(row) => row._id}
         disableSelectionOnClick
         columns={columns}

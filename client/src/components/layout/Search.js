@@ -1,55 +1,41 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import Pagination from 'react-js-pagination'
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
 import Product from '../product/Product';
-import { useDispatch, useSelector } from 'react-redux';
-import { getProducts } from '../../reducers/apiCalls';
-import { useAlert } from 'react-alert';
+import Loader from "./Loader";
+import { useGetProducts } from '../../apiCalls/productApiCalls';
 
 const Search = () => {
-  const {productsData,isFetching,error} = useSelector((state)=>state.productSlice)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [limit, setLimit] = useState("5");
+  const [category, setCategory] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [maxRating, setMaxRating] = useState(5)
+  
 
-  const [currentPage,setCurrentPage] = useState(1)
-  const [price,setPrice] = useState([1,1000])
-  const [category,setCategory] = useState('')
-  const [rating,setRating] = useState(0)
-  const [keyword,setKeyword] = useState("")
+  const { isLoading, data } = useGetProducts(currentPage, limit, search, category, sortBy, maxRating);
+  console.log(data)
+
+
+  const handleSortBySelection = (selectedSortBy) => {
+    setSortBy(selectedSortBy);
+ 
+  };
+
+
+  const handleClearFilters = () => {
+    setSearch("");
+    setSortBy("");
+    setCurrentPage(1);
+    setCategory("")
+  };
 
   const categories = [
     "Electronics",
-    "Cameras",
-    "Laptops",
     "Food",
-    "Headphones",
-    "Books",
-    "Clothes",
-    "Sports",
-    "Accessories"
+    "Mobile",
+    "Stationary"
   ]
-
-  const dispatch = useDispatch()
-  const alert = useAlert()
-
-  const createSliderWithTooltip = Slider.createSliderWithTooltip;
-  const Range = createSliderWithTooltip(Slider.Range);
-
-  useEffect(()=>{
-    getProducts(dispatch,currentPage,keyword,price,category,rating)
-    if (error) {
-      alert.error("MY ERROR")
-    }
-
-  },[dispatch,alert,error,currentPage,keyword,price,category,rating])
-
-  const setCurrentPageNo = (pageNumber) => {
-    setCurrentPage(pageNumber)
-  }
-
-
-console.log(productsData.filteredproductsCount)
-console.log(productsData.count);
+console.log(data?.data)
 
   return (
     <>
@@ -59,22 +45,7 @@ console.log(productsData.count);
           <h1 className="text-2xl text-center py-3">Filters</h1>
         </div>
       <div className='pl-6 pb-5'>
-     <Range
-     marks={{
-       1: "$1",
-       1000: "$1000"
-     }} 
-     min = {1}
-     max = {1000}
-     defaultValue = {[1,1000]}
-     tipFormatter = {value => `$${value}`}
-     tipProps={{
-       placement: "top",
-       visible: true
-     }}
-     value={price}
-     onChange = {(price)=>setPrice(price)} 
-     />
+   
      </div>
         <div className="category pl-6 pb-4 border-t border-gray-200">
           <h1 className="text-xl py-3">Category</h1>
@@ -90,7 +61,7 @@ console.log(productsData.count);
           <h1 className="text-xl pb-3">Rating</h1>
           <ul className='pl-0'>
           {[5,4,3,2,1].map((star)=>(
-           <li style={{cursor:'pointer',listStyleType:'none'}} key={star} onClick={()=> setRating(star)}>
+           <li style={{cursor:'pointer',listStyleType:'none'}} key={star} onClick={()=> setMaxRating(star)}>
             <div className='rating-outer'>
               <div className='rating-inner' style={{width: `${star * 20}%`}}>
               </div>
@@ -102,26 +73,37 @@ console.log(productsData.count);
           {/* <Rating ratingSize={'2xl'}/> */}
         </div>
         <div className="sort pl-6 py-4">
-          <h1 className="text-xl py-3">Sort</h1>
-          <div className="flex flex-col gap-2 py-2">
-            <div className="flex gap-4 items-center pl-5">
-              <input type="checkbox" />
-              <h2>Name (Ascending)</h2>
-            </div>
-            <div className="flex gap-4 items-center pl-5">
-              <input type="checkbox" />
-              <h2>Name (Descending)</h2>
-            </div>
-            <div className="flex gap-4 items-center pl-5">
-              <input type="checkbox" />
-              <h2>Rating (High to Low)</h2>
-            </div>
-            <div className="flex gap-4 items-center pl-5">
-              <input type="checkbox" />
-              <h2>Rating (Low to High)</h2>
+            <h1 className="text-2xl py-3">Sort</h1>
+            <div className="flex flex-col gap-2 py-2 pl-4">
+              <div className="flex gap-3">
+                <input
+                 className="w-4"
+                  type="checkbox"
+                  value={sortBy}
+                  checked={sortBy === "name"}
+                  onChange={() => handleSortBySelection("name")}
+                   />
+                <label for="text">Alphabetically, A-Z</label>
+              </div>
+             
+              <div className="flex gap-3">
+                <input
+                 className="w-4"
+                  type="checkbox"
+                  value={sortBy}
+                  checked={sortBy === "-name"}
+                  onChange={() => handleSortBySelection("-name")}
+                   />
+                <label for="text">Alphabetically, Z-A</label>
+              </div>
+              <button
+            onClick={handleClearFilters}
+              className="mt-1 px-4 py-2 font-base tracking-wide hover:scale-105 transition-all bg-white btn-shadow hover:shadow-custom hover:bg-stone-50 border border-gray-100 rounded-lg"
+            >
+              Clear
+            </button>
             </div>
           </div>
-        </div>
       </div>
 
       <div className="right box-border pr-12 pl-4 pt-4 w-5/6">
@@ -130,35 +112,46 @@ console.log(productsData.count);
             className="px-6 py-3 w-full text-lg bg-slate-100 rounded-full "
             type="text"
             placeholder="Search for Businesses"
-            onChange={(e)=>setKeyword(e.target.value)}
+            onChange={(e)=>setSearch(e.target.value)}
           />
         </div>
-
+        {isLoading ? <Loader/> : (
+        <>
         <div className="flex flex-col items-center gap-8">
+       
       <div className="flex flex-wrap gap-5 justify-center">
-          { productsData.products && productsData.products.map((product)=>(
+          { data.data.products.map((product)=>(
         <Product key={product._id} product={product} />
          ))
       }
      </div>
      
     </div>
-  {productsData.count <= productsData.filteredproductsCount && (
-    <div className="flex justify-center my-5">
-  <Pagination
-    activePage={currentPage}
-    itemsCountPerPage={productsData.count}
-    totalItemsCount={productsData.filteredproductsCount}
-    onChange={setCurrentPageNo}
-    nextPageText={"Next"}
-    prevPageText={"Prev"}
-    firstPageText={"First"}
-    lastPageText={"Last"}
-    itemclassName="page-item"
-    linkclassName="page-link"
-  />
-</div>
-)}
+
+  {data.data.pagination ? 
+                  <div>
+                    {data.data.pagination.prev && (
+                      <button
+                        onClick={() =>
+                          setCurrentPage(data.data.pagination.prev?.page)
+                        }
+                      >
+                        previous
+                      </button>
+                    )}
+                    <div>{currentPage}</div>
+                    {data.data.pagination.next && (
+                      <button
+                        onClick={() =>
+                          setCurrentPage(data.data.pagination.next?.page)
+                        }
+                      >
+                        next
+                      </button>
+                    )}
+                  </div>:null}
+                  </>)}
+                  
       </div>
     </div>
     </>

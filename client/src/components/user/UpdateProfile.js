@@ -1,67 +1,57 @@
-import React, { useEffect, useState } from "react";
-import { useAlert } from "react-alert";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { updateProfile, loadUser } from "../../reducers/apiCalls";
-import { updateReset } from "../../reducers/userReducers ";
-import MetaData from "../layout/MetaData";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useGetUserDetails, useUpdateProfile, useUpdateUserImage } from "../../apiCalls/userApiCalls";
+import Loader from "../layout/Loader";
 
 const UpdateProfile = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [avatar, setAvatar] = useState("");
-  const [previewAvatar, setPreviewAvatar] = useState("images/avatar.png");
-  const dispatch = useDispatch();
-  const alert = useAlert();
-  const Navigate = useNavigate();
-  const { isFetching, error, currentUser, isUpdated } = useSelector(
-    (state) => state.userSlice
-  );
-  const user = currentUser.user;
+ 
+  const usernameInputElement = useRef();
+  const emailInputElement = useRef();
 
-  useEffect(() => {
-    if (user) {
-      setName(user.name);
-      setEmail(user.email);
-      setPreviewAvatar(user.avatar.url);
-    }
+  const { currentUser } = useSelector(state => state.userSlice) || null
+  const userId = currentUser.data._id
 
-    if (error) {
-      alert.error(error);
-    }
 
-    if (isUpdated) {
-      alert.success("user is updated sucessfully");
-      loadUser(dispatch);
-      Navigate("/me");
-      dispatch(updateReset());
-    }
-  }, [error, Navigate, alert, dispatch, isUpdated]);
+  const { isLoading: isUserLoading, data: userDetails } = useGetUserDetails(userId)
+  const { mutate: updateUserImageMutate, isLoading: isUpdateUserImageLoading, isError: isUpdateUserImageError, error: updateUserImageError, } = useUpdateUserImage();
+console.log(userDetails?.data)
+  const {
+      mutate: updateProfileMutate,
+      isLoading: isUpdateProfileLoading,
+      isError: isUpdateProfileError,
+      error: updateProfileError,
+    } = useUpdateProfile();
+  
+    const handleSubmit = (event) => {
+      event.preventDefault();
+      const data = {
+        username: usernameInputElement.current?.value,
+        email: emailInputElement.current?.value,
+       userId : userId,
+      };
 
-  const submitHandler = (e) => {
-    e.preventDefault();
-    updateProfile(dispatch, { name, email, avatar });
-  };
+      console.log(data)
+      updateProfileMutate(data);
+   
+    };
 
-  const onchange = (e) => {
-    const reader = new FileReader();
-    reader.addEventListener(
-      "load",
-      function() {
-        setPreviewAvatar(reader.result);
-        setAvatar(reader.result);
-      },
-      false
-    );
-    reader.readAsDataURL(e.target.files[0]);
-  };
+    const handleFileChange = (e) => {
+      const imageData = {
+        userId: userId,
+        image: e.target.files[0],
+      };
+      updateUserImageMutate(imageData);
+    };
+
+
+    const fallbackImage = '/images/avatar.jpg';
 
   return (
     <>
-      <MetaData title={"update profile"} />
+  {isUserLoading ? <Loader/> : 
       <div className="register flex justify-center items-center mt-20 mb-10 box-border px-6">
         <div className="w-ful max-w-lg lg:w-2/5 xl:w-2/5 bg-white shadow-xl px-8 pt-10 pb-5 mx-6 rounded-md">
-          <form className="flex flex-col w-full gap-5" onSubmit={submitHandler}>
+          <form className="flex flex-col w-full gap-5" onSubmit={handleSubmit}>
             <h1 className="text-4xl font-semibold pb-3">Update Profile</h1>
             <div className="flex flex-col ">
               <label className="text-xl pb-2" for="name">
@@ -72,8 +62,9 @@ const UpdateProfile = () => {
                 id="name"
                 className="px-3 py-3 rounded-md bg-white shadow-md focus:shadow-md"
                 placeholder="Enter your name"
-                defaultValue=''
-                onChange={(e)=>setName(e.target.value)}
+                name="username"
+                defaultValue={userDetails.data.user.username}
+                ref={usernameInputElement}
               />
             </div>
             <div className="flex flex-col ">
@@ -85,8 +76,9 @@ const UpdateProfile = () => {
                 id="email_field"
                 className="px-3 py-3 rounded-md bg-white shadow-md focus:shadow-md"
                 placeholder="Enter your email"
-                defaultValue=""
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                defaultValue={userDetails.data.user.email}
+                ref={emailInputElement}
               />
             </div>
 
@@ -97,16 +89,18 @@ const UpdateProfile = () => {
               <div className="flex items-center">
                 <div className="">
                   <figure className="w-10 mr-3">
-                    <img src={previewAvatar} className="" alt="image" />
+                    <img 
+                      src={userDetails.data.user?.imgUrl || fallbackImage}
+                     className="" alt="image" />
                   </figure>
                 </div>
                 <div className="custom-file">
                   <input
-                    type="file"
-                    name="avatar"
+                   type="file"
+                   id="file"
+                   accept="image/*"
                     className="custom-file-input"
-                    id="customFile"
-                    onChange={onchange}
+                    onChange={handleFileChange}
                   />
                 </div>
               </div>
@@ -123,7 +117,7 @@ const UpdateProfile = () => {
             </div>
           </form>
         </div>
-      </div>
+      </div>}
 
     </>
   );

@@ -1,25 +1,55 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import MetaData from "../layout/MetaData";
 import CheckoutSteps from "./CheckoutSteps";
+import { usePostOrder } from "../../apiCalls/orderApiCalls";
+import { clearCart } from "../../redux/reducers/cartReducers";
 
 const ConfirmOrder = () => {
-  const { products, shippingInfo } = useSelector((state) => state.cartSlice);
+  const { cart, shippingInfo } = useSelector((state) => state.cartSlice);
   const { currentUser } = useSelector((state) => state.userSlice);
+  const userId = currentUser?.data._id
+
+  const dispatch = useDispatch()
+
+  const { mutate:postOrderMutate, isLoading:isPostOrderLoading, isError:isPostOrderError, error:postOrderError } = usePostOrder();
+
+  const userCart = cart[userId] || [];
+  const userShippingInfo = shippingInfo[userId] || [];
 
   // calculate order prices
-  const itemsPrice = products.reduce(
+  const productsPrice = userCart.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
-  const shippingPrice = itemsPrice > 200 ? 0 : 25;
-  const taxPrice = Number((0.05 * itemsPrice).toFixed(2));
-  const totalPrice = (itemsPrice + shippingPrice + taxPrice).toFixed(2);
+  const shippingPrice = productsPrice > 200 ? 30 : 60;
+  const taxPrice = Number((0.05 * productsPrice).toFixed(2));
+  const totalPrice = (productsPrice + shippingPrice + taxPrice).toFixed(2);
+
+  const handlePlaceOrder = () => {
+
+    const productIds = userCart.map((item) => item._id);
+
+    // Create an object with order details
+    const orderData = {
+      user: userId,
+      productIds, // Assuming you have a field in your Course model to store the Course ID
+      totalAmount: parseFloat(totalPrice),
+      quantity: userCart.length,
+      paymentStatus: "pending", // You can set this to a default value
+      shippingInfo: userShippingInfo,
+    };
+    postOrderMutate(orderData,{
+      onSuccess: (data) => {
+        dispatch(clearCart({ userId }));
+      },
+    })
+    
+  }
+
 
   return (
     <>
-      <MetaData title={"confirm order"} />
       <CheckoutSteps shipping="shipping" confirmOrder="confirmOrder" />
       <div className="cart items-center flex justify-center lg:flex xl:flex lg:justify-center xl:justify-center">
         <div className="wrapper w-full my-20 shadow-lg mx-6 sm:max-w-xl md:max-w-[700px] lg:max-w-[960px] xl:max-w-[960px]">
@@ -27,20 +57,20 @@ const ConfirmOrder = () => {
           <div className="pl-12">
             <p>
               <b>Name:</b>
-              {currentUser.user && currentUser.user.name}
+              {currentUser.data && currentUser.data.username}
             </p>
             <p>
               <b>Phone:</b>
-              {shippingInfo.phoneNo}
+              {userShippingInfo.phoneNo}
             </p>
             <p>
               <b>Address:</b>
-              {`${shippingInfo.address},${shippingInfo.city},${shippingInfo.postalCode},${shippingInfo.country}`}
+              {`${userShippingInfo.address},${userShippingInfo.city},${userShippingInfo.postalCode},${userShippingInfo.country}`}
             </p>
           </div>
           <h2 className="px-8 py-8 text-2xl">Your Cart Items:</h2>
           <div className="cart-content flex flex-col lg:flex-row xl:flex-row lg:justify-between xl:justify-between gap-10 pb-10">
-            {products.map((item) => (
+            {userCart.map((item) => (
               <>
                 <div className="product flex flex-col gap-5 px-8">
                   <div>
@@ -73,7 +103,7 @@ const ConfirmOrder = () => {
                   <p>
                     Subtotal:{" "}
                     <span className="float-right font-semibold">
-                      ${itemsPrice}
+                      ${productsPrice}
                     </span>
                   </p>
                   <p>
@@ -97,6 +127,7 @@ const ConfirmOrder = () => {
                   </p>
                   <div className="flex justify-center mt-5 pb-3">
                     <button
+                    onClick={handlePlaceOrder}
                       className="text-white font-semibold bg-[#e79703] w-full py-3 rounded-md hover:bg-[#d87803] hover:transition-all"
                       id="login_button"
                       type="submit"
