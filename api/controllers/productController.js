@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const Review = require('../models/Review.js');
 const asyncHandler=require('../middlewares/asyncHandler')
 const ErrorResponse= require("../utils/errorResponse")
 const jwt = require('jsonwebtoken');
@@ -183,16 +184,26 @@ exports.updateProduct = asyncHandler(async (req, res, next) => {
 
 // Delete Product
 exports.deleteProduct = asyncHandler(async (req, res, next) => {
-  const product = await Product.findById(req.params.id);
+  const productId = req.params.id;
+
+  // Find the product and its associated reviews
+  const product = await Product.findById(productId).populate('reviews');
 
   if (!product) {
-    return next(new ErrorHandler('Product not found', 404));
+    return next(new ErrorResponse('Product not found', 404));
   }
 
+  // Delete the associated reviews
+  for (const review of product.reviews) {
+    await Review.findByIdAndDelete(review._id);
+  }
+
+  // Remove the product
   await product.remove();
 
   res.status(200).json({
     success: true,
-    message: 'product deleted',
+    message: 'Product and its reviews deleted',
   });
 });
+

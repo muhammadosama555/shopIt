@@ -8,11 +8,12 @@ const Product = ({product}) => {
           <div className="product-display py-4">
             <img className="h-24 md:h-32 lg:h-40 xl:h-40" src={product.images[0].url} alt="card"/>
           </div>
+          {product.reviews.length > 0 ? 
           <div className="ratings mt-auto">
           <div className="rating-outer">
             <div className="rating-inner" style={{width: `${(product.averageRating/5)*100}%`}}></div>
-          </div>
-          </div>
+          </div> 
+          </div> : null }
           <div className="product-name">
             <h2 className="text-lg pb-4"> <Link to={`/product/${product._id}`}>{product.name}</Link></h2>
           </div>

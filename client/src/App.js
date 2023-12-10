@@ -19,6 +19,9 @@ import ConfirmOrder from "./components/cart/ConfirmOrder";
 import Offers from "./components/layout/Offers";
 import "./App.css";
 import Search from "./components/layout/Search";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 
 const queryClient = new QueryClient()
 

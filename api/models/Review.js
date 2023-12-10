@@ -1,5 +1,5 @@
 const mongoose=require('mongoose')
-const Product = require('./product.js'); // Import the Product model
+const Product = require('./product.js');
 
 
 const ReviewSchema = new mongoose.Schema({

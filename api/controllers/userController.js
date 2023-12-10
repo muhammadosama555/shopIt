@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Order = require("../models/order");
 const asyncHandler=require('../middlewares/asyncHandler')
 const ErrorResponse= require("../utils/errorResponse")
 const sharp = require("sharp");
@@ -52,19 +53,30 @@ exports.updateUser = async (req, res) => {
   };
 
 //Delete User  => /api/auth/delete/id
-exports.deleteUser = asyncHandler(async (req,res,next)=>{
-    const user = await User.findByIdAndDelete(req.params.id)
+exports.deleteUser = asyncHandler(async (req, res, next) => {
+  const userId = req.params.id;
 
-    if (!user) {
-        return next(new ErrorResponse(`User not found with id of ${req.params.id}`, 404));
-      }
-    
-    res.status(200).json({
-      success:true,
-      message: 'user has been succesfully deleted'
+  // Find the user and populate the 'orders' field
+  const user = await User.findById(userId).populate('orders');
 
-    })
-})
+  if (!user) {
+    return next(new ErrorResponse(`User not found with id of ${userId}`, 404));
+  }
+
+  // Delete the associated orders
+  for (const order of user.orders) {
+    await Order.findByIdAndDelete(order._id);
+  }
+
+  // Remove the user
+  await user.remove();
+
+  res.status(200).json({
+    success: true,
+    message: 'User and associated orders deleted successfully',
+  });
+});
+
 
 //update user image
 exports.updateUserImage = asyncHandler(async (req, res, next) => {
