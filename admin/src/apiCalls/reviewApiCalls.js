@@ -5,24 +5,19 @@ import { API_BASE_URL } from "../config";
 import { store } from "../redux/store";
 
 
-// post review
+// get all reviews
 
-export const postReview = async (reviewData) => {
-    console.log(reviewData)
-    const currentUser = store.getState().userSlice.currentUser;
-    const token = currentUser ? currentUser.token : null;
-    return axios.post(`${API_BASE_URL}/reviews`, reviewData,{
-      headers:{
-        'authorization':"Bearer "+ token
-      }
-    });
-  }
-  
-  export const usePostReview = () => {
-    const queryClient = useQueryClient()
-  return useMutation(postReview,{
-    onSuccess: (data) => {
-        queryClient.invalidateQueries('product');
+const getReviews = async () => {
+  const currentUser = store.getState().userSlice.currentUser;
+  const token = currentUser ? currentUser.token : null;
+  return await axios.get(`${API_BASE_URL}/reviews`, {
+    headers: {
+      authorization: "Bearer " + token,
     },
-  })
-  }
+  });
+};
+
+export const useGetReviews = () => {
+ 
+  return useQuery("reviews", getReviews);
+};

@@ -1,38 +1,26 @@
 import "./featuredInfo.css";
 import { ArrowDownward, ArrowUpward } from "@material-ui/icons";
 
-export default function FeaturedInfo() {
+export default function FeaturedInfo({users,products,reviews}) {
   return (
     <div className="featured">
       <div className="featuredItem">
-        <span className="featuredTitle">Revanue</span>
+        <span className="featuredTitle">Users</span>
         <div className="featuredMoneyContainer">
-          <span className="featuredMoney">$2,415</span>
-          <span className="featuredMoneyRate">
-            -11.4 <ArrowDownward  className="featuredIcon negative"/>
-          </span>
+          <span className="featuredMoney">{users.data.users.length}</span>
         </div>
-        <span className="featuredSub">Compared to last month</span>
       </div>
       <div className="featuredItem">
-        <span className="featuredTitle">Sales</span>
+        <span className="featuredTitle">Products</span>
         <div className="featuredMoneyContainer">
-          <span className="featuredMoney">$4,415</span>
-          <span className="featuredMoneyRate">
-            -1.4 <ArrowDownward className="featuredIcon negative"/>
-          </span>
+          <span className="featuredMoney">{products.data.products.length}</span>
         </div>
-        <span className="featuredSub">Compared to last month</span>
       </div>
       <div className="featuredItem">
-        <span className="featuredTitle">Cost</span>
+        <span className="featuredTitle">Reviews</span>
         <div className="featuredMoneyContainer">
-          <span className="featuredMoney">$2,225</span>
-          <span className="featuredMoneyRate">
-            +2.4 <ArrowUpward className="featuredIcon"/>
-          </span>
+          <span className="featuredMoney">{reviews.data.data.length}</span> 
         </div>
-        <span className="featuredSub">Compared to last month</span>
       </div>
     </div>
   );
